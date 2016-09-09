@@ -3,6 +3,7 @@ distrib_mk_path := $(lastword $(MAKEFILE_LIST))
 include $(PDFLATEX_MAKEFILE)
 
 md_to_tex_path := $(dir $(abspath $(distrib_mk_path)))/bin/md2tex.sh
+ebook_builder_path := $(dir $(abspath $(distrib_mk_path)))/bin/ebook_builder.sh
 export TEXINPUTS:=.:$(dir $(abspath $(distrib_mk_path))):$(TEXINPUTS)
 
 .PHONY: diff all
@@ -37,12 +38,12 @@ $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.svg
 $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.jpg
 	convert $< eps2:$@
 
-%.html: %.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX) ebook_builder.sh
-	sh ebook_builder.sh -o $@ $(EBOOK_BUILDER_ARGS)
+%.html: %.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX) $(ebook_builder_path)
+	sh $(ebook_builder_path) -o $@ $(EBOOK_BUILDER_ARGS)
 
-%.epub: %.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX) ebook_builder.sh $(POETRY_STYLESHEET)
-	sh ebook_builder.sh -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
+%.epub: %.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX) $(ebook_builder_path) $(POETRY_STYLESHEET)
+	sh $(ebook_builder_path) -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
 
-%.azw3: %.epub ebook_builder.sh
+%.azw3: %.epub $(ebook_builder_path)
 	kindlegen $< -o $@
 
