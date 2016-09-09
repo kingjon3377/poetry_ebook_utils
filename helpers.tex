@@ -1,4 +1,4 @@
-% From http://tex.stackexchange.com/questions/14512/how-to-define-a-figure-size-so-that-it-consumes-the-rest-of-a-page
+% From http://tex.stackexchange.com/questions/14512/
 % Set up a way to make illustrations as big as possible without overflowing the page
 \newcommand\measurepage{\dimexpr\pagegoal-\pagetotal-\baselineskip\relax}
 \newcommand\illustration[1]{\label{#1}\begin{center}\includegraphics[height=\measurepage,width=\textwidth,keepaspectratio]{#1}\end{center}}
