@@ -1,0 +1,119 @@
+% hard dependency of poemscol, "for managing the running headers," but we want
+% to use it for that even with poetrytex.
+\usepackage{fancyhdr}
+% Provides \ifempty, used below.
+\usepackage{etoolbox}
+
+% The first argument to the \poemscomapt command will be run if POEMSCOL is
+% defined, and the second if POETRYTEX is defined.
+\newcommand{\poemscompat}[2]{%
+	\ifdefined\POEMSCOL%
+		\ifdefined\POETRYTEX%
+			\PackageError{poemscompat}%
+				{Two incompatible packages requested}%
+				{Either \backslash POEMSCOL or \backslash POETRYTEX must be defined, but not both}%
+		\else%
+			#1%
+		\fi%
+	\else%%
+		\ifdefined\POETRYTEX%
+			#2%
+		\else%
+			\PackageError{poemscompat}%
+				{Choose which package to use}%
+				{Either \backslash POEMSCOL or \backslash POETRYTEX must be defined}%
+		\fi%
+	\fi%
+}
+
+% Set up the non-common parts of the environment
+\poemscompat{%
+	% poemscol dependencies:
+	% "to simplify page geometry" (with `geometry')
+	\usepackage{ifthen,keyval}%
+	% "for managing the index"
+	\usepackage{imakeidx}
+	% The package we use to typeset the collection
+	\usepackage{poemscol}%
+	\indexingontrue%
+	\newcommand*{\ptdedication}{Renew \textsf{\textbackslash ptdedication}}
+	\newcommand*{\makededication}[1][flushright]{%
+		\thispagestyle{empty}%
+		\vspace*{\prededicationvspace}%
+		\begin{#1}%
+			\beforededication{\dedicationformat\ptdedication}\afterdedication%
+		\end{#1}%
+		\vspace*{\postdedicationvspace}%
+	}%
+	\newcommand*{\dedicationformat}{\normalfont\itshape}%
+	\newlength{\prededicationvspace}%
+	\newlength{\postdedicationvspace}%
+	\setlength{\prededicationvspace}{\fill}%
+	\setlength{\postdedicationvspace}{\fill}%
+	\newcommand*{\beforededication}{}%
+	\newcommand*{\afterdedication}{}%
+}{%
+	% Defines the symbol we're using to separate titleless poems
+	% from the preceding ones
+	\usepackage{textcomp}%
+	% The package we use to typeset the collection
+	\usepackage{poetrytex}%
+}
+
+% The \compattitle command sets up either package's title-page knowledge. The
+% first argument is the author, the second the title. If using poetrytex and
+% wishing for a subtitle, change \ptsubtitle after calling this.
+\newcommand{\compattitle}[2]{%
+	\poemscompat{%
+		\author{#1}%
+		\title{#2}%
+	}{%
+		\renewcommand*{\pttitle}{#2}%
+		\renewcommand*{\ptauthor}{#1}%
+		\renewcommand*{\ptsubtitle}{\relax}%
+	}%
+}
+
+% Boilerplate reduction. The first argument is the title of the poem, the
+% second is its subtitle, the third is what the poem should be called if it has
+% no title---usually its incipit. Any may be blank.
+\let\defpoem\poem
+\let\enddefpoem\endpoem
+\poemscompat{%
+	\renewenvironment{poem}[3]{%
+		\ifblank{#3}{\relax}{\poemtitlenotitle{#3}}%
+		\ifblank{#1}{\relax}{\poemtitle{#1}}%
+		\ifblank{#2}{\relax}{\poemsubtitle{#2}}%
+		\defpoem}{\enddefpoem}%
+	\newcommand{\firstline}[1]{#1}%
+	\newcommand{\incipitindex}[1]{#1}%
+	\newcommand{\titleindex}[1]{\relax}%
+}{
+	\renewenvironment{poem}[3]{\nopagebreak\defpoem{#1}{#2}\ifblank{#3}{\relax}{\incipit*{#3}}\nopagebreak}{\enddefpoem}%
+	\newcommand{\firstline}[1]{\index[titles]{#1}\nopagebreak #1}%
+	\newcommand{\incipitindex}[1]{\index[titles]{#1}\nopagebreak\incipit{#1}}%
+	\newcommand{\titleindex}[1]{\index[titles]{#1}\nopagebreak}
+}
+
+% Compatibiity with the other package
+\poemscompat{%
+	\newcommand{\verselinenb}{\verseline}
+}{%
+	\newcommand{\verseline}{\\}%
+	\newcommand{\verselinenb}{\\*}%
+}
+\poemscompat{%
+	\newcommand{\ptspacer}{\relax}%
+	\newcommand{\incipit}[1]{#1}%
+	\newcommand{\silentincipit}[1]{\relax}%
+	\renewcommand{\sequencetitlepenalty}{\cleardoublepage}
+	\renewcommand{\aftersequencetitleskip}{\bigskip}
+	\renewcommand{\sequencetitlefont}{\fontsize{20}{24}\selectfont}
+}{%
+	\newenvironment{stanza}[0]{\relax}{\relax}%
+	\newcommand{\sequencetitle}[1]{\poemgroup{#1}}%
+	\newcommand{\sequencesectiontitle}[1]{\relax}%
+	\newcommand{\sequencefirstsectiontitle}[1]{\relax}%
+	\newcommand{\silentincipit}[1]{\incipit*{#1}}%
+}
+
