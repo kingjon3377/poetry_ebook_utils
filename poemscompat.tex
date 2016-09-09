@@ -11,7 +11,7 @@
 		\ifdefined\POETRYTEX%
 			\PackageError{poemscompat}%
 				{Two incompatible packages requested}%
-				{Either \backslash POEMSCOL or \backslash POETRYTEX must be defined, but not both}%
+				{Either \backslash{}POEMSCOL or \backslash{}POETRYTEX must be defined, but not both}%
 		\else%
 			#1%
 		\fi%
@@ -21,7 +21,7 @@
 		\else%
 			\PackageError{poemscompat}%
 				{Choose which package to use}%
-				{Either \backslash POEMSCOL or \backslash POETRYTEX must be defined}%
+				{Either \backslash{}POEMSCOL or \backslash{}POETRYTEX must be defined}%
 		\fi%
 	\fi%
 }
@@ -36,7 +36,7 @@
 	% The package we use to typeset the collection
 	\usepackage{poemscol}%
 	\indexingontrue%
-	\newcommand*{\ptdedication}{Renew \textsf{\textbackslash ptdedication}}
+	\newcommand*{\ptdedication}{Renew \textsf{\textbackslash{}ptdedication}}
 	\newcommand*{\makededication}[1][flushright]{%
 		\thispagestyle{empty}%
 		\vspace*{\prededicationvspace}%
@@ -77,8 +77,9 @@
 % Boilerplate reduction. The first argument is the title of the poem, the
 % second is its subtitle, the third is what the poem should be called if it has
 % no title---usually its incipit. Any may be blank.
-\let\defpoem\poem
-\let\enddefpoem\endpoem
+\let\defpoem\poem{}
+\let\enddefpoem\endpoem{}
+
 \poemscompat{%
 	\renewenvironment{poem}[3]{%
 		\ifblank{#3}{\relax}{\poemtitlenotitle{#3}}%
@@ -88,11 +89,11 @@
 	\newcommand{\firstline}[1]{#1}%
 	\newcommand{\incipitindex}[1]{#1}%
 	\newcommand{\titleindex}[1]{\relax}%
-}{
+}{%
 	\renewenvironment{poem}[3]{\nopagebreak\defpoem{#1}{#2}\ifblank{#3}{\relax}{\incipit*{#3}}\nopagebreak}{\enddefpoem}%
 	\newcommand{\firstline}[1]{\index[titles]{#1}\nopagebreak #1}%
 	\newcommand{\incipitindex}[1]{\index[titles]{#1}\nopagebreak\incipit{#1}}%
-	\newcommand{\titleindex}[1]{\index[titles]{#1}\nopagebreak}
+	\newcommand{\titleindex}[1]{\index[titles]{#1}\nopagebreak}%
 }
 
 % Compatibiity with the other package
