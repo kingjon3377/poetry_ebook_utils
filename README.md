@@ -11,3 +11,12 @@ before including `distrib.mk`).
 In addition to one set of commands that can use either `poemscol` or
 `poetrytex`, this project contains a command (not original to me) to let an
 image use up the rest of the current page, but not overflow to the next.
+
+`helpers.tex` is licensed [CC-BY-SA
+3.0](http://creativecommons.org/licenses/by-sa/3.0/), since I found its code in
+a StackExchange answer, and I have relased any copyright interest *I* had in
+the CSS file into the public domain; the rest is licensed under [the LaTeX
+Project Public License](http://www.latex-project.org/lppl.txt), version 1.3c or
+later. For the purposes of that license I consider `poemscompat.tex` to be a
+separate project from the rest of the apparatus, though they are distributed
+together and both `md2tex.sh` and `ebook_builder.sh` depend on it.
