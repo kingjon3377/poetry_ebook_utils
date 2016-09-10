@@ -1,4 +1,12 @@
 #!/bin/sh
+# Converts a poem in Markdown format to LaTeX (using poemscompat)
+#
+# Copyright 2013-2016 Jonathan Lovelace
+#
+# This project may be distributed and/or modified under the conditions of the
+# LaTeX Project Public License, either version 1.3c of this license or (at your
+# option) any later version. See ../distrib.mk for more details.
+#
 # Converts a poem in Markdown format, with a nonprinting Unicode character
 # marking (if doubled) an incipit or (if not) a first line, to the LaTeX
 # dialect that my custom commands adapt to either the poetrytex or the poemscol

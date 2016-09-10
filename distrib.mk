@@ -1,9 +1,46 @@
+# Makefile fragment for the Poetry Ebook Utilities.
+#
+# Copyright 2013-2016 Jonathan Lovelace
+#
+# This project may be distributed and/or modified under the conditions of the
+# LaTeX Project Public License, either version 1.3c of this license or (at your
+# option) any later version. The latest version of this license is in:
+#
+# http://www.latex-project.org/lppl.txt
+#
+# and version 1.3c or later is part of all distributions of LaTeX version
+# 2008/05/04 or later.
+#
+# Maintainer: Jonathan Lovelace
+# Website:    https://shinecycle.wordpress.com
+# Contact:    kingjon3377@gmail.com
+#
+# This work consists of this Makefile fragment (distrib.mk), README.md, and the
+# two shell scripts (md2tex.sh and ebook_builder.sh) in bin/. It is distributed
+# with poemscompat.tex, also under the LPPL; a small snippet (helpers.tex)
+# under the CC-BY-SA 3.0, and a sample CSS file.
+
+# Depends on pdflatex-makefile, found at
+# https://github.com/ransford/pdflatex-makefile, for building PDF; pass its
+# location in the PDFLATEX_MAKEFILE variable.
+
+# Other variables you should define, other than those required by pdflatex-makefile:
+# $(POEMS_DIR): The directory containing the individual poem files in Markdown format.
+# $(ILLUST_DIR): The directory containing images included in the book
+# $(EBOOK_BUILDER_ARGS): Any general arguments to pass to ebook_builder.sh
+# $(COVER): The path to and filename of the cover image
+# $(POETRY_STYLESHEET): The path to and filename of the CSS stylesheet you want
+#                       the EPUB and Kindle versions to use, if the stylesheet
+#                       included with this package does not suit your needs.
+
 distrib_mk_path := $(lastword $(MAKEFILE_LIST))
 %: $(distrib_mk_path)
 include $(PDFLATEX_MAKEFILE)
 
 md_to_tex_path := $(dir $(abspath $(distrib_mk_path)))/bin/md2tex.sh
 ebook_builder_path := $(dir $(abspath $(distrib_mk_path)))/bin/ebook_builder.sh
+# We define TEXINPUTS to ensure that poemscompat.tex can be found without
+# having to put its absolute or relative path into the book's source.
 export TEXINPUTS:=.:$(dir $(abspath $(distrib_mk_path))):$(TEXINPUTS)
 
 .PHONY: diff all
@@ -13,6 +50,7 @@ diff: $(PDFTARGETS)
 INDIV_POEMS:=$(patsubst %.md,%.tex,$(wildcard $(POEMS_DIR)/*.md))
 SVG_IMAGES:=$(wildcard $(ILLUST_DIR)/*.svg)
 JPG_IMAGES:=$(wildcard $(ILLUST_DIR)/*.jpg)
+# TODO: support other formats
 IMAGES:=$(SVG_IMAGES) $(JPG_IMAGES)
 EPS_IMAGES:=$(SVG_IMAGES:.svg=.eps) $(JPG_IMAGES:.jpg=.eps)
 

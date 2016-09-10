@@ -1,5 +1,12 @@
 #!/bin/bash
 # Produces an ebook version of the poetry book, as HTML or EPUB.
+#
+# Copyright 2013-2016 Jonathan Lovelace
+#
+# This project may be distributed and/or modified under the conditions of the
+# LaTeX Project Public License, either version 1.3c of this license or (at your
+# option) any later version. See ../distrib.mk for more details.
+
 
 # Any line in a poem file matching a pattern in EXCLUDE_PATTERNS will be
 # filtered out.
