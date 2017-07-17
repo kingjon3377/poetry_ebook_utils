@@ -111,7 +111,7 @@
 	\newcommand{\incipitindex}[1]{#1}%
 	\newcommand{\titleindex}[1]{\relax}%
 }{%
-	\renewenvironment{poem}[3]{\defpoem{#1}{#2}\nopagebreak\ifblank{#3}{\relax}{\incipit*{#3}}\nopagebreak}{\enddefpoem}%
+	\renewenvironment{poem}[3]{\pagebreak[2]\defpoem{#1}{#2}\nopagebreak\ifblank{#3}{\relax}{\incipit*{#3}}\nopagebreak}{\enddefpoem}%
 	\newcommand{\firstline}[1]{\index[titles]{#1}\nopagebreak #1}%
 	\newcommand{\incipitindex}[1]{\index[titles]{#1}\nopagebreak\incipit{#1}}%
 	\newcommand{\titleindex}[1]{\index[titles]{#1}\nopagebreak}%
