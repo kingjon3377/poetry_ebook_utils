@@ -47,6 +47,13 @@ tr '\n' '\f' | sed -e 's/\\verseline\f\\end{stanza}/\f\\end{stanza}/g' \
 		   -e 's/\\verselinenb\f\\end{stanza}/\f\\end{stanza}/g' | tr '\f' '\n' | \
 # Fix emphasis
 sed	-e 's/_\([^_]*\)_/\\emph{\1}/g' | \
+# Translate Markdown quoting to single-line indentation.
+sed	-e 's/\(> \|>\)/\\ptind /g' | \
+# Translate tabs to eight spaces each. They would be ignored by TeX anyway, if
+# not for the next pattern.
+sed	-e 's/	/        /g' | \
+# Translate four-space substrings to single-line indentation.
+sed	-e 's/    /\\ptind /g' | \
 # Handle nested (single-inside-double) quotes properly where we can distinguish
 # them. Since an apostrophe *should* be used at the beginning of some words, we
 # only turn an apostrophe into a left single quote where it is following a
