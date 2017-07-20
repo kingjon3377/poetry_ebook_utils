@@ -75,6 +75,11 @@ includepoem() {
 	sed -e '/^$/N;/^\n$/D' | \
 	# Wrap every non-header line in a verseline-class HTML paragraph
 	sed 's@^[^#][^#]*$@<p class="verseline">&</p>@' | \
+	# Expand tabs
+	sed 's@	@        @g' | \
+	# Make multi-space stretches non-breaking (and longer, to fit the case
+	# that required the creation of this feature); TODO: use CSS instead?
+	sed 's@    @\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;@g' | \
 	# Wrap every non-header paragraph in a stanza-class div
 	awk 'BEGIN { RS=""; pretext="<div class=\"stanza\">"; posttext="</div>"; } !/#/ { print pretext; print; print posttext; } /#/ { print }'
 	# Add a blank line after the poem.
