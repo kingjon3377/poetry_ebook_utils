@@ -25,6 +25,7 @@ OTHER_ARGS=( )
 COVER=images/cover.jpg
 OUTFILE=poems.epub
 STYLE=poetry_ebook.css
+graphics_enabled=true
 while test $# -gt 0; do
     case "$1" in
         --exclude) shift; EXCLUDE_PATTERNS+=("${1}"); shift ;;
@@ -33,6 +34,8 @@ while test $# -gt 0; do
         --style) shift; STYLE="${1}"; shift ;;
 	--front) shift; FRONTMATTER+=("${1}"); shift ;;
 	--back) shift; BACKMATTER+=("${1}"); shift ;;
+	--disable-graphics) graphics_enabled=false; shift ;;
+	--enable-graphics) graphics_enabled=true; shift ;;
         *) OTHER_ARGS+=("${1}"); shift ;;
     esac
 done
@@ -116,9 +119,11 @@ includeimage() {
 	else
 		attrs="{ width=${3} height=${4}"
 	fi
-	# The extra space at the end is to, as per the Pandoc man page, ensure that a caption is not emitted.
-	echo "![${base}](${image})${attrs}\ "
-	echo
+	if [ ${graphics_enabled:-true} = true ]; then
+		# The extra space at the end is to, as per the Pandoc man page, ensure that a caption is not emitted.
+		echo "![${base}](${image})${attrs}\ "
+		echo
+	fi
 }
 
 # An adapter method to handle including images *or* poems, and multiple files in one call.

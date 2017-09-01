@@ -5,3 +5,9 @@
 % Set up a way to make illustrations as big as possible without overflowing the page
 \newcommand\measurepage{\dimexpr\pagegoal-\pagetotal-\baselineskip\relax}
 \newcommand\illustration[1]{\label{#1}\begin{center}\includegraphics[height=\measurepage,width=\textwidth,keepaspectratio]{#1}\end{center}}
+
+\let\canonicalillustration\illustration
+
+% \disablegraphics turns our \illustration command into \relax; \enablegraphics reverses this.
+\newcommand{\enablegraphics}{\renewcommand{\illustration}[1]{\canonicalillustration}}
+\newcommand{\disablegraphics}{\renewcommand{\illustration}[1]{\label{##1}\relax}}
