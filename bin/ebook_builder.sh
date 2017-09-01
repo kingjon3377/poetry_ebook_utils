@@ -36,6 +36,7 @@ while test $# -gt 0; do
 	--back) shift; BACKMATTER+=("${1}"); shift ;;
 	--disable-graphics) graphics_enabled=false; shift ;;
 	--enable-graphics) graphics_enabled=true; shift ;;
+	--replace-graphics-with) shift; graphics_enabled="${1}"; shift ;;
         *) OTHER_ARGS+=("${1}"); shift ;;
     esac
 done
@@ -122,6 +123,9 @@ includeimage() {
 	if [ ${graphics_enabled:-true} = true ]; then
 		# The extra space at the end is to, as per the Pandoc man page, ensure that a caption is not emitted.
 		echo "![${base}](${image})${attrs}\ "
+		echo
+	elif [ ${graphics_enabled:-true} != false ]; then
+		echo "${graphics_enabled}"
 		echo
 	fi
 }
