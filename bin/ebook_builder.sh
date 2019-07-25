@@ -124,7 +124,7 @@ includeimage() {
 	fi
 	if [ "${graphics_enabled:-true}" = true ]; then
 		# The extra space at the end is to, as per the Pandoc man page, ensure that a caption is not emitted.
-		echo "![${base}](${image})${attrs}\ "
+		echo "![${base}](${image})${attrs}\\ "
 		echo
 	elif [ "${graphics_enabled:-true}" != false ]; then
 		echo "${graphics_enabled}"

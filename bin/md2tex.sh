@@ -62,8 +62,8 @@ sed	-e 's/    /\\ptind /g' | \
 # which is rarely what we want, so we add a non-printing space between them.
 # If any of this produces wrong results, either change the script, pre-process
 # its input, or post-process its output.
-sed -e "s/'\"/'\\\,\"/g" -e "s/\([:;\.]  *\)'/\1\`/g" | \
+sed -e "s/'\"/'\\\\,\"/g" -e "s/\\([:;\\.]  *\\)'/\\1\`/g" | \
 # Fix double-quotes
-gawk -F \" -e 'BEGIN { RS = "\0" }' -e "{if((NF-1)%2==0){res=\$0;for(i=1;i<NF;i++){to=\"\`\`\";if(i%2==0){to=\"\\\'\\\'\"}res=gensub(\"\\\"\", to, 1, res)};print res}else{print}}" | \
+gawk -F \" -e 'BEGIN { RS = "\0" }' -e "{if((NF-1)%2==0){res=\$0;for(i=1;i<NF;i++){to=\"\`\`\";if(i%2==0){to=\"\\\\'\\\\'\"}res=gensub(\"\\\"\", to, 1, res)};print res}else{print}}" | \
 # Strip off all trailing empty lines?
 sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' | handle_output "${2}"
