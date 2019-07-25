@@ -45,7 +45,9 @@ pandoc_version=$(pandoc -v | head -n 1 | cut -d' ' -f2)
 pandoc_major=${pandoc_version%%.*}
 pandoc_minor=${pandoc_version#*.};pandoc_minor=${pandoc_minor%%.*}
 echo "pandoc is approximately version ${pandoc_major}.${pandoc_minor}" 1>&2
-if test "${pandoc_major}" -ge 2 || ( test "${pandoc_major}" -eq 1 && test "${pandoc_minor}" -ge 16 ) ; then
+if test "${pandoc_major}" -ge 2 ; then
+	pandoc_attribs=true
+elif test "${pandoc_major}" -eq 1 && test "${pandoc_minor}" -ge 16 ; then
 	pandoc_attribs=true
 else
 	pandoc_attribs=false
@@ -120,11 +122,11 @@ includeimage() {
 	else
 		attrs="{ width=${3} height=${4}"
 	fi
-	if [ ${graphics_enabled:-true} = true ]; then
+	if [ "${graphics_enabled:-true}" = true ]; then
 		# The extra space at the end is to, as per the Pandoc man page, ensure that a caption is not emitted.
 		echo "![${base}](${image})${attrs}\ "
 		echo
-	elif [ ${graphics_enabled:-true} != false ]; then
+	elif [ "${graphics_enabled:-true}" != false ]; then
 		echo "${graphics_enabled}"
 		echo
 	fi
@@ -169,6 +171,19 @@ findimage() {
 	fi
 }
 
+# Parse a percentage dimension from TeX into its HTML equivalent. Takes the
+# name of the parameter as $1 and the command that followed that indicated this
+# is a percentage (without the backslash on either) as $2.
+parse_percent_dimension() {
+	# shellcheck disable=SC1003
+	sed 's@^\\\('"${1}"'=\)\.\([0-9]*\)\\'"${2}"'$@\1\2%@'
+}
+
+# Parse a pixel-based dimension (width or height) from TeX into its HTML equivalent.
+parse_pixel_dimension() {
+	sed 's@^\\\(width\|height\)\(=[0-9a-z]*\)$@\1\2@'
+}
+
 # Parse comma-separated params from the params part of an '\includegraphics'
 # line in the TeX document.
 read_image_params() {
@@ -177,12 +192,12 @@ read_image_params() {
 			\\keepaspectratio) : ;;
 			\\width=\\textwidth) echo "width=90%" ;;
 			\\width=.[0-9]*\\textwidth) echo "${param}" | \
-				sed 's@^\\\(width=\)\.\([0-9]*\)\\textwidth$@\1\2%@' ;;
+				parse_percent_dimension width textwidth ;;
 			\\height=\\measurepage) echo "height=90%" ;;
 			\\height=.[0-9]*\\measurepage) echo "${param}" | \
-				sed 's@^\\\(height=\)\.\([0-9]*\)\\measurepage$@\1\2%@' ;;
+				parse_percent_dimension height measurepage ;;
 			\\width*=|\\height=) echo "${param}" | \
-				sed 's@^\\\(width\|height\)\(=[0-9a-z]*\)$@\1\2@'  ;;
+				parse_pixel_dimension ;;
 		esac
 	done
 }
@@ -194,6 +209,7 @@ handle_includegraphics_line() {
 	if test -z "${params}"; then
 		findimage "${imgname}"
 	else
+	# shellcheck disable=SC2046
 		findimage "${imgname}" $(echo "${params}" | read_image_params)
 	fi
 }
@@ -258,6 +274,11 @@ translate_em_quotes_and_dashes() {
 		-e 's/---/\&mdash;/g'
 }
 
+# Translate a '\chapter*' command into a heading.
+translate_chapter_command() {
+	sed -e 's@^\\chapter\*{\([^}]*\)}$@# \1 #@'
+}
+
 # Get the front-matter (title, author, dedication, preface) from TeX and turn it into Markdown.
 frontmatter() {
 	#local preface_file="${2:-preface.tex}"
@@ -290,7 +311,7 @@ frontmatter() {
 	for file in "$@";do printing=true; while read -r line; do
 		case "${line}" in
 		\\newcommand*) continue ;;
-		\\chapter*) echo "${line}" | sed -e 's@^\\chapter\*{\([^}]*\)}$@# \1 #@' ; continue ;;
+		\\chapter*) echo "${line}" | translate_chapter_command ; continue ;;
 		\\addcontentsline*) continue ;;
 		%*) continue ;;
 		\\renewcommand\*\{\\ptdedication\}\{*) printing=false ; continue ;;
@@ -307,6 +328,34 @@ frontmatter() {
 
 	done < "${file}"; done | translate_em_quotes_and_dashes
 	echo
+}
+
+# Translate a '\section*' command into a Markdown heading.
+translate_section_command() {
+	sed -e 's@^\\section\*{\([^}]*\)}$@## \1 ##@'
+}
+
+# Translate a back-matter graphics inclusion into an 'Author Photo' line.
+translate_author_photo() {
+	sed 's@^\\includegraphics\[[^]]*\]{\([^}]*\)}$@![Author Photo](\1)@'
+}
+
+# Translate "trivial" LaTeXisms in the back-matter to Markdown equivalents.
+translate_simple_texisms() {
+	# shellcheck disable=SC2016
+	sed -e 's/%.*$//' \
+		-e 's/``/\&ldquo;/g' \
+		-e "s/''/\\&rdquo;/g" \
+		-e 's/\\LaTeX{}/LaTeX/g' \
+		-e 's/\\textit{\([^}]*\)}/_\1_/g' \
+		-e 's/\\texttt{\([^}]*\)}/`\1`/g' \
+		-e 's@\\textbf{\([^}]*\)}@**\1**@g' \
+		-e 's/\\\\//g' -e 's/\\url{\([^}]*\)}/[\1](\1)/g' \
+		-e 's/\\mbox{\([^}]*\)}/\1/g' \
+		-e 's/{\\\(small\|footnotesize\)\([^}]*\)}/`\2`/g' \
+		-e 's/---/\&mdash;/g' \
+		-e 's@~@ @g' \
+		-e 's@\\\\@@g'
 }
 
 # Get the back-matter (acknowledgements, illustration sources,
@@ -326,32 +375,20 @@ backmatter() {
 		esac
 		while read -r line;do
 			case "${line}" in
-			\\chapter*) echo "${line}" | sed -e 's@^\\chapter\*{\([^}]*\)}$@# \1 #@' ; continue ;;
+			\\chapter*) echo "${line}" | translate_chapter_command ; continue ;;
 			\\addcontentsline*) continue ;;
 			%*) continue ;;
-			\\section*) echo "${line}" | sed -e 's@^\\section\*{\([^}]*\)}$@## \1 ##@' ; continue ;;
+			\\section*) echo "${line}" | translate_section_command ; continue ;;
 			*\\ptgroup*) continue ;;
 			\\begin\{wrapfigure\}*) continue ;;
 			\\end\{wrapfigure\}*) continue ;;
 			\\vspace*) continue ;;
-			\\includegraphics*) echo "${line}" | sed 's@^\\includegraphics\[[^]]*\]{\([^}]*\)}$@![Author Photo](\1)@' ;;
+			\\includegraphics*) echo "${line}" | translate_author_photo ;;
 			\\clearpage*) continue ;;
 			'') echo; continue ;;
 			*) echo "${line}" ;;
 			esac
-		done < "${file}" | sed -e 's/%.*$//' \
-			-e 's/``/\&ldquo;/g' \
-			-e "s/''/\\&rdquo;/g" \
-			-e 's/\\LaTeX{}/LaTeX/g' \
-			-e 's/\\textit{\([^}]*\)}/_\1_/g' \
-			-e 's/\\texttt{\([^}]*\)}/`\1`/g' \
-			-e 's@\\textbf{\([^}]*\)}@**\1**@g' \
-			-e 's/\\\\//g' -e 's/\\url{\([^}]*\)}/[\1](\1)/g' \
-			-e 's/\\mbox{\([^}]*\)}/\1/g' \
-			-e 's/{\\\(small\|footnotesize\)\([^}]*\)}/`\2`/g' \
-			-e 's/---/\&mdash;/g' \
-			-e 's@~@ @g' \
-			-e 's@\\\\@@g'
+		done < "${file}" | translate_simple_texisms
 		echo
 	done
 
