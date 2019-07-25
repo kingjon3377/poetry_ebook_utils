@@ -169,6 +169,35 @@ findimage() {
 	fi
 }
 
+# Parse comma-separated params from the params part of an '\includegraphics'
+# line in the TeX document.
+read_image_params() {
+	while read -r -d ',' param;do
+		case "${param}" in
+			\\keepaspectratio) : ;;
+			\\width=\\textwidth) echo "width=90%" ;;
+			\\width=.[0-9]*\\textwidth) echo "${param}" | \
+				sed 's@^\\\(width=\)\.\([0-9]*\)\\textwidth$@\1\2%@' ;;
+			\\height=\\measurepage) echo "height=90%" ;;
+			\\height=.[0-9]*\\measurepage) echo "${param}" | \
+				sed 's@^\\\(height=\)\.\([0-9]*\)\\measurepage$@\1\2%@' ;;
+			\\width*=|\\height=) echo "${param}" | \
+				sed 's@^\\\(width\|height\)\(=[0-9a-z]*\)$@\1\2@'  ;;
+		esac
+	done
+}
+
+# Handle an '\includegraphics' line in the TeX document. Passed a line of input
+# including the image name and any parameters as separate words.
+handle_includegraphics_line() {
+	read -r imgname params
+	if test -z "${params}"; then
+		findimage "${imgname}"
+	else
+		findimage "${imgname}" $(echo "${params}" | read_image_params)
+	fi
+}
+
 # Handle a line in the TeX document.
 handle_line() {
 	if test $# -eq 0; then return; fi
@@ -206,23 +235,7 @@ handle_line() {
 		# shellcheck disable=SC2001
 		findimage "$(echo "${1}" | sed 's/^[ 	]*\\illustration{\([^}]*\)}[ 	]*$/\1/')" "" 90% ;;
 	*includegraphics*) echo "${1}" | sed -e 's@^[ 	]*\\includegraphics\[\([^]]*\)\]{\([^}]*\)}[ 	]*$@\2 \1@' \
-			-e 's@^[ 	]*\\includegraphics{\([^}]*\)}[ 	]*$@\1@' | { read -r imgname params
-		if test -z "${params}"; then
-			findimage "${imgname}"
-		else
-			findimage "${imgname}" $(echo "${params}" | tr ',' '\n' | while read -r param;do
-				case "${param}" in
-					\\keepaspectratio) : ;;
-					\\width=\\textwidth) echo "width=90%" ;;
-					\\width=.[0-9]*\\textwidth) echo "${param}" | \
-						sed 's@^\\\(width=\)\.\([0-9]*\)\\textwidth$@\1\2%@' ;;
-					\\height=\\measurepage) echo "height=90%" ;;
-					\\height=.[0-9]*\\measurepage) echo "${param}" | \
-						sed 's@^\\\(height=\)\.\([0-9]*\)\\measurepage$@\1\2%@' ;;
-					\\width*=|\\height=) echo "${param}" | \
-						sed 's@^\\\(width\|height\)\(=[0-9a-z]*\)$@\1\2@'  ;;
-				esac; done)
-		fi } ;;
+			-e 's@^[ 	]*\\includegraphics{\([^}]*\)}[ 	]*$@\1@' | handle_includegraphics_line ;;
 	'') : ;;
 	%*) echo "<!-- ${1##%} -->" ;;
 	'\begin{center}') echo '<div class="centered">' ;;
@@ -233,6 +246,16 @@ handle_line() {
 	\\vspace*) : ;;
 	*) { echo -n "Unhandled line:"; for i in "$@";do echo -n " '${i}'";done; echo; } 1>&2 ;;
 	esac
+}
+
+# Translate '\em' constructs, quotes, and dashes into Markdown equivalents.
+translate_em_quotes_and_dashes() {
+	# We want to match literal backquotes, so single quotes disabling their expansion is a feature.
+	# shellcheck disable=SC2016
+	sed -e 's/\\emph{\([^}]*\)}/_\1_/g' \
+		-e 's/``/\&ldquo;/g' \
+		-e "s/''/\\&rdquo;/g" \
+		-e 's/---/\&mdash;/g'
 }
 
 # Get the front-matter (title, author, dedication, preface) from TeX and turn it into Markdown.
@@ -282,13 +305,7 @@ frontmatter() {
 			continue
 		fi
 
-	done < "${file}"; done | \
-	# We want to match literal backquotes, so single quotes disabling their expansion is a feature.
-	# shellcheck disable=SC2016
-	sed -e 's/\\emph{\([^}]*\)}/_\1_/g' \
-		-e 's/``/\&ldquo;/g' \
-		-e "s/''/\\&rdquo;/g" \
-		-e 's/---/\&mdash;/g'
+	done < "${file}"; done | translate_em_quotes_and_dashes
 	echo
 }
 
