@@ -26,6 +26,7 @@ COVER=images/cover.jpg
 OUTFILE=poems.epub
 STYLE=poetry_ebook.css
 graphics_enabled=true
+cover_enabled=false
 while test $# -gt 0; do
     case "$1" in
         --exclude) shift; EXCLUDE_PATTERNS+=("${1}"); shift ;;
@@ -37,6 +38,8 @@ while test $# -gt 0; do
 	--disable-graphics) graphics_enabled=false; shift ;;
 	--enable-graphics) graphics_enabled=true; shift ;;
 	--replace-graphics-with) shift; graphics_enabled="${1}"; shift ;;
+	--include-cover) cover_enabled=true; shift ;;
+	--exclude-cover) cover_enabled=false; shift ;;
         *) OTHER_ARGS+=("${1}"); shift ;;
     esac
 done
@@ -222,6 +225,14 @@ handle_line() {
 	*clearpage*) echo '<div class="clearpage" />' ;;
 	*cleardoublepage*) echo '<div class="cleardoublepage" />' ;;
 	# Emit equivalent headers for sequence and section titles.
+	*poemscompat*sectiontitle*) subsectionheader "$(echo "${1}" | \
+			sed -e 's/^[ 	]*poemscompat{\\sequencefirstsectiontitle{\([^}]*\)}}{\\sequencetitle{[^}]*}}[ 	]*$/\1/' \
+				-e 's/^[ 	]*\\poemscompat{\\sequencefirstsectiontitle{\([^}]*\)}}{\\sequencetitle{[^}]*}}[ 	]*$/\1/' \
+				-e 's/^[ 	]*poemscompat{\\sequencesectiontitle{\([^}]*\))}{\\sequencetitle{[^}]*}}[ 	]*$/\1/' \
+				-e 's/^[ 	]*\\poemscompat{\\sequencesectiontitle{\([^}]*\)}}{\\sequencetitle{[^}]*}}[ 	]*$/\1/' )" ;;
+	*poemscompat*sequencetitle*) sectionheader "$(echo "${1}" | \
+			sed -e 's/^[ 	]*poemscompat{\\sequencetitle{\([^}]*\)}}{\\relax}[ 	]*$/\1/' \
+				-e 's/^[ 	]*\\poemscompat{\\sequencetitle{\([^}]*\)}}{\\relax}[ 	]*$/\1/')" ;;
 	*sequencetitle*) sectionheader "$(echo "${1}" | sed -e 's/^[ 	]*sequencetitle{\([^}]*\)}[ 	]*$/\1/' \
 		-e 's/^[ 	]*\\sequencetitle{\([^}]*\)}[ 	]*$/\1/' )" ;;
 	*sequence*sectiontitle*) subsectionheader "$(echo "${1}" | \
@@ -415,8 +426,13 @@ case "${out}" in
 	markdownbook "${OTHER_ARGS[@]}" | sed -e '/^$/N;/^\n$/D' | \
 		pandoc -t html -s -o "${out}" --css="${STYLE:-poetry_ebook.css}" ;;
 *epub)
-	markdownbook "${OTHER_ARGS[@]}" | sed -e '/^$/N;/^\n$/D' | \
-		pandoc -t epub -o "${out}" --epub-cover-image="${COVER:-images/cover.jpg}" \
-			--epub-stylesheet="${STYLE:-poetry_ebook.css}" ;;
+	if test "${cover_enabled:-false}" = true; then
+		markdownbook "${OTHER_ARGS[@]}" | sed -e '/^$/N;/^\n$/D' | \
+			pandoc -t epub -o "${out}" --epub-cover-image="${COVER:-images/cover.jpg}" \
+				--epub-stylesheet="${STYLE:-poetry_ebook.css}"
+	else
+		markdownbook "${OTHER_ARGS[@]}" | sed -e '/^$/N;/^\n$/D' | \
+			pandoc -t epub -o "${out}" --epub-stylesheet="${STYLE:-poetry_ebook.css}"
+	fi ;;
 *md) markdownbook "${OTHER_ARGS[@]}" | sed -e '/^$/N;/^\n$/D' > "${out}" ;;
 esac
