@@ -301,47 +301,50 @@ frontmatter() {
 	grep -h coltitle  "${@}" | sed -n 's:^\\newcommand{\\coltitle}{\([^}]*\)}$:% \1:p'
 	grep -h colauthor "${@}" | sed -n 's:^\\newcommand{\\colauthor}{\([^}]*\)}$:% \1:p'
 
-	if grep -q ptdedication "${@}"; then
-		echo
-		echo '### Dedication ###'
-		echo
-		for file in "${@}";do
+	for file in "$@";do
+		# shellcheck disable=SC2094
+		if grep -q ptdedication "${file}"; then
+			echo
+			echo '### Dedication ###'
+			echo
+			# shellcheck disable=SC2094
 			grep -q ptdedication "${file}" && \
 				awk \
 					'BEGIN { printing = 0; }
-					 /ptdedication/ { printing = 1; next; }
-					 printing == 0 { next; }
-					 /{/ { printing++; }
-					 /}/ { printing--; }
-					 { print; }' "${file}" | \
+					/ptdedication/ { printing = 1; next; }
+					printing == 0 { next; }
+					/{/ { printing++; }
+					/}/ { printing--; }
+					{ print; }' "${file}" | \
 				sed -e 's/\\\\$/  /' \
 					-e '/^%/d' \
 					-e 's:\\bigskip:<br />:' \
 					-e 's/}$//' \
 					-e 's/^[ 	]*//'
 			echo
-		done
-	fi
-
-	for file in "$@";do printing=true; while read -r line; do
-		case "${line}" in
-		\\newcommand*) continue ;;
-		\\chapter*) echo "${line}" | translate_chapter_command ; continue ;;
-		\\addcontentsline*) continue ;;
-		%*) continue ;;
-		\\renewcommand\*\{\\ptdedication\}\{*) printing=false ; continue ;;
-		\\clearpage) continue ;;
-		*\}) if test "${printing}" != true; then printing=true; continue; fi ;;
-		'') echo; continue ;;
-		*) : ;;
-		esac
-		if test "${printing}" = true; then
-			echo "${line}"
-		else
-			continue
 		fi
 
-	done < "${file}"; done | translate_em_quotes_and_dashes
+		printing=true
+		while read -r line; do
+			case "${line}" in
+			\\newcommand*) continue ;;
+			\\chapter*) echo "${line}" | translate_chapter_command ; continue ;;
+			\\addcontentsline*) continue ;;
+			%*) continue ;;
+			\\renewcommand\*\{\\ptdedication\}\{*) printing=false ; continue ;;
+			\\clearpage) continue ;;
+			*\}) if test "${printing}" != true; then printing=true; continue; fi ;;
+			'') echo; continue ;;
+			*) : ;;
+			esac
+			if test "${printing}" = true; then
+				echo "${line}"
+			else
+				continue
+			fi
+
+		done < "${file}"
+	done | translate_em_quotes_and_dashes
 	echo
 }
 
