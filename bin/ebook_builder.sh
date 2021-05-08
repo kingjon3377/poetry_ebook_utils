@@ -252,8 +252,10 @@ handle_line() {
 		while read -r line; do handle_line "${line}"; done < "${file}" ;;
 	# Handle including poems specially, since their TeX is generated from Markdown.
 	*includepoem*) includepoem "$(echo "${1}" | \
-			sed -e 's/^[ 	]*\\includepoem{\([^}]*\)}{[^}]*}{[^}]*}{[^}]*}{[^}]*}[ 	]*$/\1.md/' \
-				-e 's/^[ 	]*\\includepoem{\([^}]*\)}{\\em{[^}]*}}{[^}]*}{[^}]*}{[^}]*}[ 	]*$/\1.md/')"
+			sed -e 's/includepoemalternateindex\({[^}]*}{[^}]*}{[^}]*}{[^}]*}{[^}]*}\){[^}]*}/includepoem\1/g' \
+				-e 's/@\\emph{[^}]*}//' \
+				-e 's/^[ 	]*\\includepoem{\([^}]*\)}{[^}]*}{[^}]*}{[^}]*}{[^}]*}[ 	]*$/\1.md/' \
+				-e 's/^[ 	]*\\includepoem{\([^}]*\)}{\\emph{[^}]*}}{[^}]*}{[^}]*}{[^}]*}[ 	]*$/\1.md/')"
 			;;
 	# When the TeX includes an image, emit equivalent Markdown
 	# TODO: Get metadata for scaling from a comment on the line, if there is one.
