@@ -273,6 +273,8 @@ handle_line() {
 	\\label*) : ;;
 	\\topskip*) : ;;
 	\\vspace*) : ;;
+	# Skip page-style commands
+	\\thispagestyle*) : ;;
 	*) { echo -n "Unhandled line:"; for i in "$@";do echo -n " '${i}'";done; echo; } 1>&2 ;;
 	esac
 }
