@@ -27,6 +27,7 @@ OUTFILE=poems.epub
 STYLE=poetry_ebook.css
 graphics_enabled=true
 cover_enabled=false
+PAGE_BREAKS=( )
 while test $# -gt 0; do
     case "$1" in
         --exclude) shift; EXCLUDE_PATTERNS+=("${1}"); shift ;;
@@ -40,6 +41,7 @@ while test $# -gt 0; do
 	--replace-graphics-with) shift; graphics_enabled="${1}"; shift ;;
 	--include-cover) cover_enabled=true; shift ;;
 	--exclude-cover) cover_enabled=false; shift ;;
+	--page-break) shift; PAGE_BREAKS+=( "${1}" "${2}" ); shift; shift ;;
         *) OTHER_ARGS+=("${1}"); shift ;;
     esac
 done
@@ -59,6 +61,18 @@ fi
 # Returns true if a file exists as a regular file or a link, false otherwise
 file_or_link() {
 	test -f "${1}" -o -h "${1}"
+}
+
+insert_requested_anchors() {
+	array=( "${PAGE_BREAKS[@]}" )
+	test "${#array[@]}" -eq 0 && return
+	i=0
+	local sed_script=( )
+	while test $i -lt "${#array[@]}" ; do
+		sed_script+=( -e "s@${array[$i]}@<a id=\"page-${array[$((i + 1))]}-starts\" />&@" )
+		i=$((i + 2))
+	done
+	sed "${sed_script[@]}"
 }
 
 # Include a poem into the ebook
@@ -89,6 +103,7 @@ includepoem() {
 	# Make multi-space stretches non-breaking (and longer, to fit the case
 	# that required the creation of this feature); TODO: use CSS instead?
 	sed 's@    @\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;@g' | \
+	insert_requested_anchors | \
 	# Wrap every non-header paragraph in a stanza-class div
 	awk 'BEGIN { RS=""; pretext="<div class=\"stanza\">"; posttext="</div>"; } !/#/ { print pretext; print; print posttext; } /#/ { print }'
 	# Add a blank line after the poem.
@@ -217,6 +232,11 @@ handle_includegraphics_line() {
 	fi
 }
 
+# Translate a magic comment indicating where a page break falls into an anchor.
+translate_page_marker() {
+	sed -e 's@^\(.*\)%.*page \([0-9]*\) begins.*$@\1<a id="page-\2-starts" />@'
+}
+
 # Handle a line in the TeX document.
 handle_line() {
 	if test $# -eq 0; then return; fi
@@ -266,6 +286,7 @@ handle_line() {
 	*includegraphics*) echo "${1}" | sed -e 's@^[ 	]*\\includegraphics\[\([^]]*\)\]{\([^}]*\)}[ 	]*$@\2 \1@' \
 			-e 's@^[ 	]*\\includegraphics{\([^}]*\)}[ 	]*$@\1@' | handle_includegraphics_line ;;
 	'') : ;;
+	*%*page*begins*) echo "${line}" | translate_page_marker ;;
 	%*) echo "<!-- ${1##%} -->" ;;
 	'\begin{center}') echo '<div class="centered">' ;;
 	'\end{center}') echo '</div>' ;;
@@ -295,6 +316,7 @@ translate_chapter_command() {
 }
 
 # Get the front-matter (title, author, dedication, preface) from TeX and turn it into Markdown.
+# TODO: distinguish based on file type
 frontmatter() {
 	#local preface_file="${2:-preface.tex}"
 	# The title and author are in metadata.tex
@@ -330,6 +352,7 @@ frontmatter() {
 			\\newcommand*) continue ;;
 			\\chapter*) echo "${line}" | translate_chapter_command ; continue ;;
 			\\addcontentsline*) continue ;;
+			*%*page*begins*) echo "${line}" | translate_page_marker ; continue ;;
 			%*) continue ;;
 			\\renewcommand\*\{\\ptdedication\}\{*) printing=false ; continue ;;
 			\\clearpage) continue ;;
@@ -395,6 +418,7 @@ backmatter() {
 			case "${line}" in
 			\\chapter*) echo "${line}" | translate_chapter_command ; continue ;;
 			\\addcontentsline*) continue ;;
+			*%*page*begins*) echo "${line}" | translate_page_marker ; continue ;;
 			%*) continue ;;
 			\\section*) echo "${line}" | translate_section_command ; continue ;;
 			*\\ptgroup*) continue ;;
