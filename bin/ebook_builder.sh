@@ -429,10 +429,10 @@ case "${out}" in
 	if test "${cover_enabled:-false}" = true; then
 		markdownbook "${OTHER_ARGS[@]}" | sed -e '/^$/N;/^\n$/D' | \
 			pandoc -t epub -o "${out}" --epub-cover-image="${COVER:-images/cover.jpg}" \
-				--epub-stylesheet="${STYLE:-poetry_ebook.css}"
+				--css="${STYLE:-poetry_ebook.css}"
 	else
 		markdownbook "${OTHER_ARGS[@]}" | sed -e '/^$/N;/^\n$/D' | \
-			pandoc -t epub -o "${out}" --epub-stylesheet="${STYLE:-poetry_ebook.css}"
+			pandoc -t epub -o "${out}" --css="${STYLE:-poetry_ebook.css}"
 	fi ;;
 *md) markdownbook "${OTHER_ARGS[@]}" | sed -e '/^$/N;/^\n$/D' > "${out}" ;;
 esac
