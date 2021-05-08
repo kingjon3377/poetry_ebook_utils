@@ -279,7 +279,7 @@ handle_line() {
 	esac
 }
 
-# Translate '\em' constructs, quotes, and dashes into Markdown equivalents.
+# Translate '\emph' constructs, quotes, and dashes into Markdown equivalents.
 translate_em_quotes_and_dashes() {
 	# We want to match literal backquotes, so single quotes disabling their expansion is a feature.
 	# shellcheck disable=SC2016
