@@ -39,6 +39,7 @@ include $(PDFLATEX_MAKEFILE)
 
 md_to_tex_path := $(dir $(abspath $(distrib_mk_path)))/bin/md2tex.sh
 ebook_builder_path := $(dir $(abspath $(distrib_mk_path)))/bin/ebook_builder.sh
+add_to_epub_path := $(dir $(abspath $(distrib_mk_path)))/bin/add_to_epub.sh
 # We define TEXINPUTS to ensure that poemscompat.tex can be found without
 # having to put its absolute or relative path into the book's source.
 export TEXINPUTS:=.:$(dir $(abspath $(distrib_mk_path))):$(TEXINPUTS)
@@ -79,9 +80,10 @@ $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.jpg
 %.html: %.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX) $(ebook_builder_path)
 	sh $(ebook_builder_path) -o $@ $(EBOOK_BUILDER_ARGS)
 
-%.epub: %.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX) $(ebook_builder_path) $(POETRY_STYLESHEET)
+%.epub: %.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
 	sh $(ebook_builder_path) -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
+	sh $(add_to_epub_path) $@ page-map.xml
 
-%.azw3: %.epub $(ebook_builder_path)
+%.azw3: %.epub
 	kindlegen $< -o $@
 
