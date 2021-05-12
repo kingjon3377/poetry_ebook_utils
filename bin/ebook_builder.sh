@@ -410,7 +410,7 @@ translate_simple_texisms() {
 backmatter() {
 	for file in "$@";do
 		case "${file}" in
-		*.md|*.txt|*.htm|*.html) cat "${file}" ; echo ; continue ;;
+		*.md|*.txt|*.htm|*.html|*.xhtml) cat "${file}" ; echo ; continue ;;
 		*.tex) : ;;
 		*) echo "Unexpected backmatter file ${file}" 1>&2; return 3 ;;
 		esac
