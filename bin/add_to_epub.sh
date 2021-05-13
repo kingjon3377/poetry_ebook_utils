@@ -21,7 +21,8 @@ for file in "${files_to_include[@]}";do
 		\\t<item id=\"$(basename "${file}" | tr . _)\" href=\"${file}\" media-type=\"${mime}\" />\
 " "${tmpdir}/EPUB/content.opf"
 done
+(
 cd "${tmpdir}"
 zip -Xr9D "${full_epub}" -- mimetype *
-cd -
+)
 rm -r "${tmpdir}"
