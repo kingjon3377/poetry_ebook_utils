@@ -82,10 +82,12 @@ $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.svg
 $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.jpg
 	convert $< eps2:$@
 
-%.html: %.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX) $(ebook_builder_path)
+COMMON_INCLUSIONS=%.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX)
+
+%.html: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
 	sh $(ebook_builder_path) -o $@ $(EBOOK_BUILDER_ARGS)
 
-%.epub: %.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
+%.epub: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(EPUB_INCLUSIONS) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
 	sh $(ebook_builder_path) -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
 	sh $(add_to_epub_path) $@ page-map.xml
 
