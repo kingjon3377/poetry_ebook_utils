@@ -48,6 +48,11 @@ export TEXINPUTS:=.:$(dir $(abspath $(distrib_mk_path))):$(TEXINPUTS)
 diff: $(PDFTARGETS)
 	echo $(foreach T,$(PDFTARGETS:.pdf=),$(T).old.pdf $(T).pdf ) | xargs -P 2 -n 2 diffpdf
 
+MDTARGETS = $(TARGETS:=.md)
+EPUBTARGETS = $(TARGETS:=.epub)
+KINDLE_TARGETS = $(TARGETS:=.azw3)
+HTMLTARGETS = $(TARGETS:=.html)
+
 INDIV_POEMS:=$(patsubst %.md,%.tex,$(wildcard $(POEMS_DIR)/*.md))
 SVG_IMAGES:=$(wildcard $(ILLUST_DIR)/*.svg)
 JPG_IMAGES:=$(wildcard $(ILLUST_DIR)/*.jpg)
