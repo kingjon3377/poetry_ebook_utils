@@ -97,3 +97,4 @@ $(MDTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
 %.azw3: %.epub
 	kindlegen $< -o $@
 
+%: Makefile
