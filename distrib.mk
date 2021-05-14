@@ -84,6 +84,9 @@ $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.jpg
 
 COMMON_INCLUSIONS=%.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX)
 
+$(MDTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
+	sh $(ebook_builder_path)  $(EBOOK_BUILDER_ARGS) -o $@
+
 %.html: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
 	sh $(ebook_builder_path) -o $@ $(EBOOK_BUILDER_ARGS)
 
