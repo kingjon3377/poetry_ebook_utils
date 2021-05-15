@@ -82,7 +82,7 @@ $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.svg
 $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.jpg
 	convert $< eps2:$@
 
-COMMON_INCLUSIONS=%.tex $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX)
+COMMON_INCLUSIONS=$(wildcard *.tex) $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX)
 
 $(MDTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
 	sh $(ebook_builder_path)  $(EBOOK_BUILDER_ARGS) -o $@
