@@ -87,7 +87,7 @@ COMMON_INCLUSIONS=$(wildcard *.tex) $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX)
 $(MDTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
 	sh $(ebook_builder_path)  $(EBOOK_BUILDER_ARGS) -o $@
 
-%.html: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
+$(HTMLTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
 	sh $(ebook_builder_path) -o $@ $(EBOOK_BUILDER_ARGS)
 
 %.epub: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(EPUB_INCLUSIONS) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
