@@ -18,7 +18,7 @@ for file in "${files_to_include[@]}";do
 		mime=$(file --mime-type "${file}")
 	fi
 	sed -i -e "/\\/manifest/i \
-		\\t<item id=\"$(basename "${file}" | tr . _)\" href=\"${file}\" media-type=\"${mime}\" />\
+		<item id=\"$(basename "${file}" | tr . _)\" href=\"${file}\" media-type=\"${mime}\" />\
 " "${tmpdir}/EPUB/content.opf"
 done
 (
