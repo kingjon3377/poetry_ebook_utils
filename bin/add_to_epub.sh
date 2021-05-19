@@ -7,7 +7,7 @@ files_to_include=( )
 for file in "$@";do
 	test -f "${file}" && files_to_include+=( "${file}" )
 done
-test "${#files_to_include[@]}" -eq 0 && return 0
+test "${#files_to_include[@]}" -eq 0 && exit 0
 tmpdir=$(mktemp -d)
 unzip -d "${tmpdir}" "${epub}"
 cp "${files_to_include[@]}" "${tmpdir}/EPUB"
