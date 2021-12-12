@@ -60,8 +60,6 @@ JPG_IMAGES:=$(wildcard $(ILLUST_DIR)/*.jpg)
 IMAGES:=$(SVG_IMAGES) $(JPG_IMAGES)
 EPS_IMAGES:=$(SVG_IMAGES:.svg=.eps) $(JPG_IMAGES:.jpg=.eps)
 
-$(PDFTARGETS): $(INDIV_POEMS) $(IMAGES)
-
 TEX4HTEXTS:=4tc 4ct 4cc css dvi idv lg tmp xref
 METAD_EXTS:=top ctn idx ilg ind
 POETRY_STYLESHEET:=$(dir $(abspath $(distrib_mk_path)))/poetry_ebook.css
@@ -89,6 +87,8 @@ $(MDTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
 
 $(HTMLTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
 	sh $(ebook_builder_path) -o $@ $(EBOOK_BUILDER_ARGS)
+
+$(PDFTARGETS): $(COMMON_INCLUSIONS)
 
 %.epub: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(EPUB_INCLUSIONS) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
 	sh $(ebook_builder_path) -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
