@@ -1,9 +1,25 @@
 #!/bin/bash -e
+# Add a file to an EPUB, including adding it to the manifest in content.opf. If
+# the EPUB doesn't exist fails with an error, but silently succeeds if no files
+# to add provided (and silently discards any nonexistent files provided on the
+# command line)
+usage() {
+	echo "Usage: add_to_epub.sh ebook.epub file_to_add.ext [addl_file.ext ...]" 1>&2
+}
+if ! test $# -ge 1; then
+	usage
+	exit 1
+fi
 epub="${1}"
 full_epub="$(realpath "${epub}")"
 shift
-test -f "${epub}" || exit 1
+if !  test -f "${epub}";
+	echo "EPUB file ${epub} does not exist" 1>&2
+	usage
+	exit 1
+fi
 files_to_include=( )
+# TODO: support a "verbose debug" mode that logs if a specified file doesn't exist
 for file in "$@";do
 	test -f "${file}" && files_to_include+=( "${file}" )
 done
