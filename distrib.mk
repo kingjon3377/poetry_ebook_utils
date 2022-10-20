@@ -68,7 +68,7 @@ POETRY_STYLESHEET:=$(dir $(abspath $(distrib_mk_path)))/poetry_ebook.css
 
 EXTRACLEAN += $(INDIV_POEMS) $(EPS_IMAGES) texput.log $(ILLUST_FROM_SVG)
 EXTRACLEAN += $(foreach EXT,$(TEX4HTEXTS),$(TARGETS:=.$(EXT)))
-EXTRACLEAN += $(foreach EXT,$(METAD_EXTS),$(TARGETS:-.$(EXT)))
+EXTRACLEAN += $(foreach EXT,$(METAD_EXTS),$(TARGETS:=.$(EXT)))
 EXTRADISTCLEAN += $(TARGETS:=.html) $(TARGETS:=.epub) $(TARGETS:=.azw3)
 
 $(ILLUST_DIR)/%.pdf: $(ILLUST_DIR)/%.svg
