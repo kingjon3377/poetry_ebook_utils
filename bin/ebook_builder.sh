@@ -277,6 +277,8 @@ handle_line() {
 				-e 's/^[ 	]*\\includepoem{\([^}]*\)}{[^}]*}{[^}]*}{[^}]*}{[^}]*}[ 	]*$/\1.md/' \
 				-e 's/^[ 	]*\\includepoem{\([^}]*\)}{\\emph{[^}]*}}{[^}]*}{[^}]*}{[^}]*}[ 	]*$/\1.md/')"
 			;;
+	# Skip comment lines causing the next case to match inappropriately
+	*%*illustration*) : ;;
 	# When the TeX includes an image, emit equivalent Markdown
 	# TODO: Get metadata for scaling from a comment on the line, if there is one.
 	*illustration*)
