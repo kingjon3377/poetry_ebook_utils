@@ -32,6 +32,8 @@
 # $(POETRY_STYLESHEET): The path to and filename of the CSS stylesheet you want
 #                       the EPUB and Kindle versions to use, if the stylesheet
 #                       included with this package does not suit your needs.
+# $(ILLUST_FROM_SVG): The list of images (under $(ILLUST_DIR), but including
+#                     that prefix in each one) to regenerate from SVG.
 
 distrib_mk_path := $(lastword $(MAKEFILE_LIST))
 %: $(distrib_mk_path)
@@ -64,10 +66,13 @@ TEX4HTEXTS:=4tc 4ct 4cc css dvi idv lg tmp xref
 METAD_EXTS:=top ctn idx ilg ind
 POETRY_STYLESHEET:=$(dir $(abspath $(distrib_mk_path)))/poetry_ebook.css
 
-EXTRACLEAN += $(INDIV_POEMS) $(EPS_IMAGES) texput.log
+EXTRACLEAN += $(INDIV_POEMS) $(EPS_IMAGES) texput.log $(ILLUST_FROM_SVG)
 EXTRACLEAN += $(foreach EXT,$(TEX4HTEXTS),$(TARGETS:=.$(EXT)))
 EXTRACLEAN += $(foreach EXT,$(METAD_EXTS),$(TARGETS:-.$(EXT)))
 EXTRADISTCLEAN += $(TARGETS:=.html) $(TARGETS:=.epub) $(TARGETS:=.azw3)
+
+$(ILLUST_DIR)/%.pdf: $(ILLUST_DIR)/%.svg
+	rsvg-convert -f pdf -o $@ $<
 
 $(POEMS_DIR)/%.tex: $(POEMS_DIR)/%.md
 	$(md_to_tex_path) $(POEMS_DIR)/$*.md $@
@@ -88,7 +93,7 @@ $(MDTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
 $(HTMLTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
 	sh $(ebook_builder_path) -o $@ $(EBOOK_BUILDER_ARGS)
 
-$(PDFTARGETS): $(COMMON_INCLUSIONS)
+$(PDFTARGETS): $(COMMON_INCLUSIONS) $(filter %.pdf,$(ILLUST_FROM_SVG))
 
 %.epub: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(EPUB_INCLUSIONS) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
 	sh $(ebook_builder_path) -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
