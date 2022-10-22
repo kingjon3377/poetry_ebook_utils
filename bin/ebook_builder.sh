@@ -184,7 +184,7 @@ findimage() {
 	elif file_or_link "${base}.jpg"; then
 		includeimage "${base}.jpg" "$@"
 	else
-		echo "Image ${1} not found" 1>&2
+		echo "Image ${base} not found" 1>&2
 		exit 2
 	fi
 }
