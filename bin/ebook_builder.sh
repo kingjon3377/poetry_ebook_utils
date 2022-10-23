@@ -65,7 +65,7 @@ file_or_link() {
 
 insert_requested_anchors() {
 	array=( "${PAGE_BREAKS[@]}" )
-	test "${#array[@]}" -eq 0 && return
+	test "${#array[@]}" -eq 0 && cat && return
 	i=0
 	local sed_script=( )
 	while test $i -lt "${#array[@]}" ; do
