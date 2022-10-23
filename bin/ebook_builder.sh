@@ -284,7 +284,9 @@ handle_line() {
 	*illustration*)
 		# This is too complicated for shell parameter substitution.
 		# shellcheck disable=SC2001
-		findimage "$(echo "${1}" | sed 's/^[ 	]*\\illustration{\([^}]*\)}[ 	]*$/\1/')" "" 90% ;;
+		findimage "$(echo "${1}" | \
+			sed -e 's/^[ 	]*\\illustration{\([^}]*\)}[ 	]*$/\1/' \
+				-e 's/^[ 	]*\\fixedheightillustration{\([^}]*\)}{[^}]*}[ 	]*$/\1/')" "" 90% ;;
 	*includegraphics*) echo "${1}" | sed -e 's@^[ 	]*\\includegraphics\[\([^]]*\)\]{\([^}]*\)}[ 	]*$@\2 \1@' \
 			-e 's@^[ 	]*\\includegraphics{\([^}]*\)}[ 	]*$@\1@' | handle_includegraphics_line ;;
 	'') : ;;
