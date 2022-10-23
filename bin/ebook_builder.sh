@@ -83,9 +83,9 @@ includepoem() {
 	fi
 	sedargs=()
 	for pattern in "${EXCLUDE_PATTERNS[@]}"; do
-		sedargs+=("-e")
-		sedargs+=("/${pattern}/d")
+		sedargs+=("-e" "/${pattern}/d")
 	done
+	# TODO: Minimize/combine sed calls
 	# Exclude unwanted lines
 	sed "${1}" "${sedargs[@]}" | \
 	# Use em-dashes where appropriate
