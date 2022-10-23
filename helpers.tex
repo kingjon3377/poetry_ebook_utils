@@ -1,13 +1,17 @@
-% From http://tex.stackexchange.com/a/17813, by StackExchange user Aditya; the
-% code in this file is thus used under the CC-BY-SA license version 3.0
-% <http://creativecommons.org/licenses/by-sa/3.0/>
+% The main trick here comes from http://tex.stackexchange.com/a/17813, by
+% StackExchange user Aditya; the code in this file is thus used under the
+% CC-BY-SA license version 3.0 <http://creativecommons.org/licenses/by-sa/3.0/>
+% Some further extension by Jonathan Lovelace.
 
 % Set up a way to make illustrations as big as possible without overflowing the page
 \newcommand\measurepage{\dimexpr\pagegoal-\pagetotal-\baselineskip\relax}
 \newcommand\illustration[1]{\label{#1}\begin{center}\includegraphics[height=\measurepage,width=\textwidth,keepaspectratio]{#1}\end{center}}
 
+\newcommand\fixedheightillustration[2]{\label{#1}\begin{center}\includegraphics[height=#2,width=\textwidth,keepaspectratio]{#1}\end{center}}
+
 \let\canonicalillustration\illustration
+\let\canonicalfhillustration\fixedheightillustration
 
 % \disablegraphics turns our \illustration command into \relax; \enablegraphics reverses this.
-\newcommand{\enablegraphics}{\renewcommand{\illustration}[1]{\canonicalillustration}}
-\newcommand{\disablegraphics}{\renewcommand{\illustration}[1]{\label{##1}\relax}}
+\newcommand{\enablegraphics}{\renewcommand{\illustration}[1]{\canonicalillustration}\renewcommand{\fixedheightillustration}[2]{\canonicalfhillustration}}
+\newcommand{\disablegraphics}{\renewcommand{\illustration}[1]{\label{##1}\relax}\renewcommand{\fixedheightillustration}[2]{\label{##1}\relax}}
