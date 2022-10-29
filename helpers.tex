@@ -15,3 +15,11 @@
 % \disablegraphics turns our \illustration command into \relax; \enablegraphics reverses this.
 \newcommand{\enablegraphics}{\renewcommand{\illustration}[1]{\canonicalillustration}\renewcommand{\fixedheightillustration}[2]{\canonicalfhillustration}}
 \newcommand{\disablegraphics}{\renewcommand{\illustration}[1]{\label{##1}\relax}\renewcommand{\fixedheightillustration}[2]{\label{##1}\relax}}
+
+% This trick comes from https://tex.stackexchange.com/a/600, by StackExchange
+% user lockstep; it is used under CC-BY-SA license version 2.5.
+% This creates a 'changemargin' environment, which takes the right and left
+% margin (or maybe inner and outer?) figures as first and second parameters.
+
+\def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
+\let\endchangemargin=\endlist
