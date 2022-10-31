@@ -260,6 +260,9 @@ handle_line() {
 				-e 's/^[ 	]*\\sequencefirstsectiontitle{\([^}]*\)}[ 	]*$/\1/' \
 				-e 's/^[ 	]*sequencesectiontitle{\([^}]*\)}[ 	]*$/\1/' \
 				-e 's/^[ 	]*\\sequencesectiontitle{\([^}]*\)}[ 	]*$/\1/' )" ;;
+	'\epigram{'*'}') echo -n '##### '
+		# shellcheck disable=SC2001
+		echo "${1}" | sed 's@^\\epigram{\([^}]*\)}@\1@' ;;
 	# Anytime the TeX includes a file, we want to handle its contents.
 	*input*)
 		# This is too complicated for shell parameter substitution.
