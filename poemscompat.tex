@@ -134,8 +134,8 @@
 }{%
 	\newenvironment{stanza}[0]{\relax}{\relax}%
 	\newcommand{\sequencetitle}[1]{\poemgroup{#1}}%
-	\newcommand{\sequencesectiontitle}[1]{\relax}%
-	\newcommand{\sequencefirstsectiontitle}[1]{\relax}%
+	\newcommand{\sequencesectiontitle}[1]{\subsection{#1}\addcontentsline{top}{subsection}{#1}}
+	\newcommand{\sequencefirstsectiontitle}[1]{\sequencesectiontitle{#1}}%
 	\newcommand{\silentincipit}[1]{\incipit*{#1}}%
 }
 \poemscompat{%
