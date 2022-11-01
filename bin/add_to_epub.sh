@@ -50,6 +50,8 @@ for file in "${files_to_include[@]}";do
 	else
 		mime=$(file --mime-type "${file}")
 	fi
+#	cp "${file}" "${tmpdir}/EPUB" # FIXME: Do we need this?
+	debug_print "Adding ${file} to manifest as ${mime}"
 	sed -i -e "/\\/manifest/i \
 		<item id=\"$(basename "${file}" | tr . _)\" href=\"${file}\" media-type=\"${mime}\" />\
 " "${tmpdir}/EPUB/content.opf"
