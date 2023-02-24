@@ -17,7 +17,7 @@ if test $# -ne 2; then
 	exit 1
 fi
 handle_output() {
-	if test "x${1}x" = "x-x"; then
+	if test "${1}" = "-"; then
 		cat
 	else
 		cat > "${1}"
