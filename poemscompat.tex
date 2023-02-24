@@ -79,6 +79,8 @@
 	\usepackage{textcomp}%
 	% The package we use to typeset the collection
 	\usepackage{poetrytex}%
+	% Needed to fix poem-group styling, below
+	\usepackage{sectsty}%
 }
 
 % The \compattitle command sets up either package's title-page knowledge. The
@@ -108,11 +110,15 @@
 		\ifblank{#2}{\relax}{\poemsubtitle{#2}}%
 		\defpoem}{\enddefpoem}%
 	\newcommand{\firstline}[1]{#1}%
+	\newcommand{\bangfirstline}[2]{#2}%
+	\newcommand{\bangincipit}[2]{#2}%
 	\newcommand{\incipitindex}[1]{#1}%
 	\newcommand{\titleindex}[1]{\relax}%
 }{%
 	\renewenvironment{poem}[3]{\pagebreak[2]\defpoem{#1}{#2}\nopagebreak\ifblank{#3}{\relax}{\incipit*{#3}}\nopagebreak}{\enddefpoem}%
 	\newcommand{\firstline}[1]{\index[titles]{#1}\nopagebreak #1}%
+	\newcommand{\bangfirstline}[2]{\index[titles]{#1}\nopagebreak #2}%
+	\newcommand{\bangincipit}[2]{\index[titles]{#1}\nopagebreak\incipit{#2}}%
 	\newcommand{\incipitindex}[1]{\index[titles]{#1}\nopagebreak\incipit{#1}}%
 	\newcommand{\titleindex}[1]{\index[titles]{#1}\nopagebreak}%
 }

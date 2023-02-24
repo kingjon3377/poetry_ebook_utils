@@ -32,8 +32,12 @@ sed	-e '/^$/N;/^\n$/D' | \
 # Replace end of lines with poetrytex end-of-lines.
 sed	-e '1,4s/  $/\\verselinenb/' \
 	-e '5,$s/  $/\\verseline/' | \
+# Replace a double occurrence of our marker characters, when there is a ! between them, with bangincipit{}
+sed	-e 's/￹￹\(.*\)!\(.*\)￻￻/\\bangincipit{\1"!\2}{\1!\2}/g' | \
 # Replace a double occurrence of our marker characters with incipit{}.
 sed	-e 's/￹￹\(.*\)￻￻/\\incipit{\1}/g' | \
+# Replace a single occurrence of our marker characters, when there is a ! between them, with bangfirstline{}
+sed	-e 's/￹\(.*\)!\(.*\)￻/\\bangfirstline{\1"!\2}{\1!\2}/g' | \
 # Replace a single occurrence of our marker characters with firstline{}.
 sed	-e 's/￹\(.*\)￻/\\firstline{\1}/g' | \
 # Replace blank lines with stanza markers
