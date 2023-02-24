@@ -36,8 +36,6 @@ sed	-e '1,4s/  $/\\verselinenb/' \
 sed	-e 's/￹￹\(.*\)￻￻/\\incipit{\1}/g' | \
 # Replace a single occurrence of our marker characters with firstline{}.
 sed	-e 's/￹\(.*\)￻/\\firstline{\1}/g' | \
-# Fix broken index entries caused by exclamation marks in marked lines
-sed	-e '/incipit/s/!/"!/g' -e '/firstline/s/!/"!/g' | \
 # Replace blank lines with stanza markers
 sed	-e '1,$s/^$/\\end{stanza}\n\n\\begin{stanza}/' | \
 # Get rid of first 'end' and last 'begin'-stanza in file.
