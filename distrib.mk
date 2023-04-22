@@ -53,6 +53,12 @@ define svg-to-pdf
 endef
 endif
 
+ifneq ($(wildcard "/usr/bin/ack"),)
+grep_func := /usr/bin/ack
+else
+grep_func := /bin/grep -r --binary-files=without-match
+endif
+
 md_to_tex_path := $(dir $(abspath $(distrib_mk_path)))/bin/md2tex.sh
 ebook_builder_path := $(dir $(abspath $(distrib_mk_path)))/bin/ebook_builder.sh
 add_to_epub_path := $(dir $(abspath $(distrib_mk_path)))/bin/add_to_epub.sh
@@ -60,7 +66,7 @@ add_to_epub_path := $(dir $(abspath $(distrib_mk_path)))/bin/add_to_epub.sh
 # having to put its absolute or relative path into the book's source.
 export TEXINPUTS:=.:$(dir $(abspath $(distrib_mk_path))):$(TEXINPUTS)
 
-.PHONY: diff all
+.PHONY: diff all check-fixmes
 diff: $(PDFTARGETS)
 	echo $(foreach T,$(PDFTARGETS:.pdf=),$(T).old.pdf $(T).pdf ) | xargs -P 2 -n 2 diffpdf
 
@@ -102,13 +108,17 @@ $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.jpg
 
 COMMON_INCLUSIONS=$(wildcard *.tex) $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX)
 
-$(MDTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
+$(MDTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path) check-fixmes
 	sh $(ebook_builder_path)  $(EBOOK_BUILDER_ARGS) -o $@
 
-$(HTMLTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path)
+$(HTMLTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path) check-fixmes
 	sh $(ebook_builder_path) -o $@ $(EBOOK_BUILDER_ARGS)
 
-$(PDFTARGETS): $(COMMON_INCLUSIONS) $(filter %.pdf,$(ILLUST_FROM_SVG))
+$(PDFTARGETS): $(COMMON_INCLUSIONS) $(filter %.pdf,$(ILLUST_FROM_SVG)) check-fixmes
+
+check-fixmes:
+	@$(grep_func) FIXME . || true
+	@$(grep_func) TODO . || true
 
 %.epub: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(EPUB_INCLUSIONS) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
 	sh $(ebook_builder_path) -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
