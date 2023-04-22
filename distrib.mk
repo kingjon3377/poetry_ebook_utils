@@ -39,6 +39,20 @@ distrib_mk_path := $(lastword $(MAKEFILE_LIST))
 %: $(distrib_mk_path)
 include $(PDFLATEX_MAKEFILE)
 
+ifneq ($(QUIET),)
+kindle_filter	:= grep -v '^Info'
+md_to_tex_arg	:=
+define svg-to-pdf
+	rsvg-convert -f pdf -o $(1) $(2)
+endef
+else
+kindle_filter	:= cat
+md_to_tex_arg	:= --verbose
+define svg-to-pdf
+	echo rsvg-convert -f pdf -o $(1) $(2) && rsvg-convert -f pdf -o $(1) $(2)
+endef
+endif
+
 md_to_tex_path := $(dir $(abspath $(distrib_mk_path)))/bin/md2tex.sh
 ebook_builder_path := $(dir $(abspath $(distrib_mk_path)))/bin/ebook_builder.sh
 add_to_epub_path := $(dir $(abspath $(distrib_mk_path)))/bin/add_to_epub.sh
@@ -73,10 +87,10 @@ EXTRACLEAN += titles.idx titles.ilg titles.ind
 EXTRADISTCLEAN += $(TARGETS:=.html) $(TARGETS:=.epub) $(TARGETS:=.azw3)
 
 $(ILLUST_DIR)/%.pdf: $(ILLUST_DIR)/%.svg
-	rsvg-convert -f pdf -o $@ $<
+	@$(call svg-to-pdf,$@,$<)
 
 $(POEMS_DIR)/%.tex: $(POEMS_DIR)/%.md
-	$(md_to_tex_path) $(POEMS_DIR)/$*.md $@
+	@$(md_to_tex_path) $(md_to_tex_arg) $(POEMS_DIR)/$*.md $@
 
 all: $(TARGETS:=.html) $(TARGETS:=.epub) $(TARGETS:=.azw3)
 
@@ -101,6 +115,6 @@ $(PDFTARGETS): $(COMMON_INCLUSIONS) $(filter %.pdf,$(ILLUST_FROM_SVG))
 	sh $(add_to_epub_path) $@ page-map.xml
 
 %.azw3: %.epub
-	kindlegen $< -o $@
+	kindlegen $< -o $@ | $(kindle_filter)
 
 %: Makefile
