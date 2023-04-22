@@ -12,8 +12,27 @@
 # dialect that my custom commands adapt to either the poetrytex or the poemscol
 # package. Arguments: $1 is the Markdown original; $2 is the TeX file to create.
 # Either can be - to indicate standard input or output, respectively
+# "--verbose" can be provided anywhere on the command line, and will cause the
+# script to emit an indicator message at the end; "$1" and "$2" are after removing
+# that flag from the arguments.
+VERBOSE=false
+for arg in "$@";do
+	case "${arg}" in
+	--verbose|-v) VERBOSE=true; continue;;
+	--quiet|-q) VERBOSE=fals; continue ;;
+	esac
+	if test -z "${firstarg}"; then
+		firstarg="${arg}"
+	elif test -z "${secondarg}"; then
+		secondarg="${arg}"
+	else
+		echo "Usage: $0 [-v|--verbose] [-q|--quiet] original.md target.tex" 1>&2
+		exit 1
+	fi
+done
+set -- "${firstarg}" "${secondarg}"
 if test $# -ne 2; then
-	echo "Usage: md2tex.sh original.md target.tex" 1>&2
+	echo "Usage: $0 [-v|--verbose] [-q|--quiet] original.md target.tex" 1>&2
 	exit 1
 fi
 handle_output() {
@@ -71,3 +90,12 @@ sed -e "s/'\"/'\\\\,\"/g" -e "s/\\([:;\\.]  *\\)'/\\1\`/g" | \
 gawk -F \" -e 'BEGIN { RS = "\0" }' -e "{if((NF-1)%2==0){res=\$0;for(i=1;i<NF;i++){to=\"\`\`\";if(i%2==0){to=\"\\\\'\\\\'\"}res=gensub(\"\\\"\", to, 1, res)};print res}else{print}}" | \
 # Strip off all trailing empty lines?
 sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' | handle_output "${2}"
+if test $? -eq 0; then
+	if test "${VERBOSE:-false}" = true; then
+		echo "$0 $1 $2"
+	fi
+else
+	if test "${VERBOSE:-false}" = true; then
+		echo "$0 $1 $2 FAILED" 1>&2
+	fi
+fi
