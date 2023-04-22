@@ -23,3 +23,20 @@
 
 \def\changemargin#1#2{\list{}{\rightmargin#2\leftmargin#1}\item[]}
 \let\endchangemargin=\endlist
+
+% This trick comes from https://tex.stackexchange.com/a/11709, by StackExchange
+% user Martin Scharrer; it is used under CC-BY-SA license version 2.5. This is
+% like \cleardoublepage except that it advances to the next *left* page.
+\makeatletter
+\newcommand*{\cleartoverso}{%
+	\clearpage
+	\if@twoside
+		\ifodd\c@page
+			\hbox{}\newpage
+			\if@twocolumn
+				\hbox{}\newpage
+			\fi
+		\fi
+	\fi
+}
+\makeatother
