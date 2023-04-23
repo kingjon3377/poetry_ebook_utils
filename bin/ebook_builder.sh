@@ -49,7 +49,7 @@ done
 pandoc_version=$(pandoc -v | head -n 1 | cut -d' ' -f2)
 pandoc_major=${pandoc_version%%.*}
 pandoc_minor=${pandoc_version#*.};pandoc_minor=${pandoc_minor%%.*}
-echo "pandoc is approximately version ${pandoc_major}.${pandoc_minor}" 1>&2
+#echo "pandoc is approximately version ${pandoc_major}.${pandoc_minor}" 1>&2
 if test "${pandoc_major}" -ge 2 ; then
 	pandoc_attribs=true
 elif test "${pandoc_major}" -eq 1 && test "${pandoc_minor}" -ge 16 ; then
