@@ -54,7 +54,7 @@ endef
 endif
 
 ifneq ($(wildcard "/usr/bin/ack"),)
-grep_func := /usr/bin/ack
+grep_func := /usr/bin/ack --type=tex --type=make --type=markdown
 else
 grep_func := /bin/grep -r --binary-files=without-match
 endif
