@@ -26,6 +26,9 @@ div.clearpage {
 div.cleardoublepage {
 	page-break-before: right;
 }
+div.cleartoverso {
+	page-break-before: left;
+}
 body { margin: 5%; text-align: justify; font-size: medium; }
 code { font-family: monospace; }
 h1 { text-align: left; }

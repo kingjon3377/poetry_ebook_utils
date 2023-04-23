@@ -244,6 +244,9 @@ handle_line() {
 	# When asked to clear the page, emit a div to do that.
 	*clearpage*) echo '<div class="clearpage" />' ;;
 	*cleardoublepage*) echo '<div class="cleardoublepage" />' ;;
+	'\cleartoverso') echo '<div class="cleartoverso" />' ;;
+	# Skip part-of-the-book commands that primarily control page numbering styles
+	'\frontmatter'|'\mainmatter'|'\backmatter') : ;;
 	# Emit equivalent headers for sequence and section titles.
 	*poemscompat*sectiontitle*) subsectionheader "$(echo "${1}" | \
 			sed -e 's/^[ 	]*poemscompat{\\sequencefirstsectiontitle{\([^}]*\)}}{\\sequencetitle{[^}]*}}[ 	]*$/\1/' \
