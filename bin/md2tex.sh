@@ -15,11 +15,18 @@
 # "--verbose" can be provided anywhere on the command line, and will cause the
 # script to emit an indicator message at the end; "$1" and "$2" are after removing
 # that flag from the arguments.
+# If a file with the same basename as $2, but with extension .pregen.tex
+# instead of merelly .tex, exists and --ignore-pregen is not passed as an
+# option, the .pregen.tex file is copied to $2 instead of following the usual
+# procedure.
 VERBOSE=false
+IGNORE_PREGEN=false
 for arg in "$@";do
 	case "${arg}" in
 	--verbose|-v) VERBOSE=true; continue;;
 	--quiet|-q) VERBOSE=fals; continue ;;
+	--ignore-pregen) IGNORE_PREGEN=true; continue ;;
+	--no-ignore-pregen) IGNORE_PREGEN=false; continue ;;
 	esac
 	if test -z "${firstarg}"; then
 		firstarg="${arg}"
@@ -34,6 +41,14 @@ set -- "${firstarg}" "${secondarg}"
 if test $# -ne 2; then
 	echo "Usage: $0 [-v|--verbose] [-q|--quiet] original.md target.tex" 1>&2
 	exit 1
+fi
+if test -f "${secondarg%%.tex}.pregen.tex"; then
+	if test "${IGNORE_PREGEN:-false}" != true; then
+		cp "${secondarg%%.tex}.pregen.tex" "${secondarg}" # FIXME: What if $2 is a directory?
+		exit $?
+	else
+		echo "Ignoring pregen file ${secondarg%%.tex}.pregen.tex" 1>&2 # Implement debug_print
+	fi
 fi
 handle_output() {
 	if test "${1}" = "-"; then
