@@ -59,6 +59,16 @@ else
 grep_func := grep -r --binary-files=without-match
 endif
 
+ifneq (, $(shell which kindlegen))
+define to-kindle
+	kindlegen $(1) -o $(2) | $(kindle_filter)
+endef
+else
+define to-kindle
+	ebook-convert $(1) $(2) | $(kindle_filter)
+endef
+endif
+
 md_to_tex_path := $(dir $(abspath $(distrib_mk_path)))/bin/md2tex.sh
 ebook_builder_path := $(dir $(abspath $(distrib_mk_path)))/bin/ebook_builder.sh
 add_to_epub_path := $(dir $(abspath $(distrib_mk_path)))/bin/add_to_epub.sh
@@ -131,6 +141,6 @@ check-fixmes:
 	sh $(add_to_epub_path) $@ page-map.xml
 
 %.azw3: %.epub
-	kindlegen $< -o $@ | $(kindle_filter)
+	@$(call to-kindle,$<,$@)
 
 %: Makefile
