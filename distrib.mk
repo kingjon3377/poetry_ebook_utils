@@ -53,10 +53,10 @@ define svg-to-pdf
 endef
 endif
 
-ifneq ($(wildcard /usr/bin/ack),)
-grep_func := /usr/bin/ack --type=tex --type=make --type=markdown
+ifneq (, $(shell which ack))
+grep_func := ack --type=tex --type=make --type=markdown
 else
-grep_func := /bin/grep -r --binary-files=without-match
+grep_func := grep -r --binary-files=without-match
 endif
 
 md_to_tex_path := $(dir $(abspath $(distrib_mk_path)))/bin/md2tex.sh
