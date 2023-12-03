@@ -9,12 +9,19 @@
 
 \newcommand\fixedheightillustration[2]{\label{#1}{\centering\includegraphics[height=#2,width=\textwidth,keepaspectratio]{#1}\par}}
 
+\newcommand\extraheightillustration[2]{\label{#1}{\centering\includegraphics[height=\measurepage+\2,width=\textwidth,keepaspectratio]{#1}\par}}
+
 \let\canonicalillustration\illustration
 \let\canonicalfhillustration\fixedheightillustration
+\let\canonicalehillustration\extraheightillustration
 
 % \disablegraphics turns our \illustration command into \relax; \enablegraphics reverses this.
-\newcommand{\enablegraphics}{\renewcommand{\illustration}[1]{\canonicalillustration}\renewcommand{\fixedheightillustration}[2]{\canonicalfhillustration}}
-\newcommand{\disablegraphics}{\renewcommand{\illustration}[1]{\label{##1}\relax}\renewcommand{\fixedheightillustration}[2]{\label{##1}\relax}}
+\newcommand{\enablegraphics}{\renewcommand{\illustration}[1]{\canonicalillustration}%
+    \renewcommand{\fixedheightillustration}[2]{\canonicalfhillustration}%
+    \renewcommand{\extraheightillustration}[2]{\canonicalehillustration}}
+\newcommand{\disablegraphics}{\renewcommand{\illustration}[1]{\label{##1}\relax}%
+    \renewcommand{\fixedheightillustration}[2]{\label{##1}\relax}%
+    \renewcommand{\extraheightillustration}[2]{\label{##1}\relax}}
 
 % This trick comes from https://tex.stackexchange.com/a/600, by StackExchange
 % user lockstep; it is used under CC-BY-SA license version 2.5.

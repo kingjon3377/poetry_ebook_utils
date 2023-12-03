@@ -292,7 +292,8 @@ handle_line() {
 		# shellcheck disable=SC2001
 		findimage "$(echo "${1}" | \
 			sed -e 's/^[ 	]*\\illustration{\([^}]*\)}[ 	]*$/\1/' \
-				-e 's/^[ 	]*\\fixedheightillustration{\([^}]*\)}{[^}]*}[ 	]*$/\1/')" "" 90% ;;
+				-e 's/^[ 	]*\\fixedheightillustration{\([^}]*\)}{[^}]*}[ 	]*$/\1/' \
+				-e 's/^[ 	]*\\extraheightillustration{\([^}]*\)}[ ]*$/\1/')" "" 90% ;;
 	*includegraphics*) echo "${1}" | sed -e 's@^[ 	]*\\includegraphics\[\([^]]*\)\]{\([^}]*\)}[ 	]*$@\2 \1@' \
 			-e 's@^[ 	]*\\includegraphics{\([^}]*\)}[ 	]*$@\1@' | handle_includegraphics_line ;;
 	'') : ;;
