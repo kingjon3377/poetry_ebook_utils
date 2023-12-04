@@ -18,6 +18,10 @@ FRONTMATTER=( )
 # acknowledgements and the about-the-author section. Files can be TeX or
 # Markdown.
 BACKMATTER=( )
+# By default we turn the 'title' line of poems into just a 'section' element
+# where that is entirely contained in quotes, as that generally indicates it's
+# actually the incipit; ACTUALLY_TITLED is files where this is a false positive.
+ACTUALLY_TITLED=( )
 # Arguments that are not immediately following one of the options we handle are
 # assumed to hold (possibly after some recursion) the poems and images that
 # make up the "main matter."
@@ -28,9 +32,11 @@ STYLE=poetry_ebook.css
 graphics_enabled=true
 cover_enabled=false
 PAGE_BREAKS=( )
+
 while test $# -gt 0; do
     case "$1" in
         --exclude) shift; EXCLUDE_PATTERNS+=("${1}"); shift ;;
+		--actually-titled) shift; ACTUALLY_TITLED+=("${1}"); shift ;;
         --cover) shift; COVER="${1}"; shift ;;
         --out|-o) shift; OUTFILE="${1}"; shift ;;
         --style) shift; STYLE="${1}"; shift ;;
@@ -75,16 +81,45 @@ insert_requested_anchors() {
 	sed "${sed_script[@]}"
 }
 
+wrap_in_section() {
+	if test -n "${1}";then
+		echo "<section id=\"$(echo -n "${1,,}" | sed -e 's@[^a-z0-9][^a-z0-9]*@-@g' -e 's@^-@@' -e 's@-$@@')\" class=\"${2:-level3}\">"
+		cat
+		echo '</section>'
+	else
+		cat
+	fi
+}
+
 # Include a poem into the ebook
 includepoem() {
 	if ! file_or_link "${1}" ; then
 		echo "Poem ${1} not found" 1>&2
 		exit 2
 	fi
+	local section_arg=undefined
+	local real_title=false
+	if sed -n "${1}" -e '1p' | grep -q '^## ".*" ##$'; then
+		for file in "${ACTUALLY_TITLED[@]}";do
+			if test "${file}" = "${1}";then
+				real_title=true
+				break
+			fi
+		done
+		if test "${real_title}" = false; then
+			section_arg="$(sed -n "${1}" -e '1p')"
+		fi
+	else
+		real_title=true
+		section_arg=
+	fi
 	sedargs=()
 	for pattern in "${EXCLUDE_PATTERNS[@]}"; do
 		sedargs+=("-e" "/${pattern}/d")
 	done
+	if test "${real_title}" != true; then
+		sedargs+=( "-e" '/^## ".*" ##$/d' )
+	fi
 	# TODO: Minimize/combine sed calls
 	# Exclude unwanted lines
 	sed "${1}" "${sedargs[@]}" | \
@@ -105,7 +140,8 @@ includepoem() {
 	sed 's@    @\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;@g' | \
 	insert_requested_anchors | \
 	# Wrap every non-header paragraph in a stanza-class div
-	awk 'BEGIN { RS=""; pretext="<div class=\"stanza\">"; posttext="</div>"; } !/#/ { print pretext; print; print posttext; } /#/ { print }'
+	awk 'BEGIN { RS=""; pretext="<div class=\"stanza\">"; posttext="</div>"; } !/#/ { print pretext; print; print posttext; } /#/ { print }' | \
+	wrap_in_section "${section_arg}" level3
 	# Add a blank line after the poem.
 	echo
 }
