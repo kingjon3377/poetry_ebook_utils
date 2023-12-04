@@ -293,7 +293,7 @@ handle_line() {
 		findimage "$(echo "${1}" | \
 			sed -e 's/^[ 	]*\\illustration{\([^}]*\)}[ 	]*$/\1/' \
 				-e 's/^[ 	]*\\fixedheightillustration{\([^}]*\)}{[^}]*}[ 	]*$/\1/' \
-				-e 's/^[ 	]*\\extraheightillustration{\([^}]*\)}[ ]*$/\1/' \
+				-e 's/^[ 	]*\\extraheightillustration{\([^}]*\)}{[^}]*}[ 	 ]*$/\1/' \
 				-e 's/^[ 	]*\\justifiedillustration{\([^}]*\)}[ 	]*$/\1/')" "" 90% ;;
 	*includegraphics*) echo "${1}" | sed -e 's@^[ 	]*\\includegraphics\[\([^]]*\)\]{\([^}]*\)}[ 	]*$@\2 \1@' \
 			-e 's@^[ 	]*\\includegraphics{\([^}]*\)}[ 	]*$@\1@' | handle_includegraphics_line ;;
