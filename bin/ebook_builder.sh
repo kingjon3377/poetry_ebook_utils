@@ -302,6 +302,8 @@ handle_line() {
 	%*) echo "<!-- ${1##%} -->" ;;
 	'\begin{center}') echo '<div class="centered">' ;;
 	'\end{center}') echo '</div>' ;;
+	'{\centering%') echo '<div class="centered">' ;;
+	'\par} % end \centering') echo '</div>' ;;
 	# We *want* literal backslash-literal character sequences.
 	\\label*) : ;;
 	\\topskip*) : ;;
