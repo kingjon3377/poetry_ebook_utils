@@ -372,8 +372,10 @@ translate_chapter_command() {
 frontmatter() {
 	#local preface_file="${2:-preface.tex}"
 	# The title and author are in metadata.tex
-	grep -h coltitle  "${@}" | sed -n 's:^\\newcommand{\\coltitle}{\([^}]*\)}$:% \1:p'
-	grep -h colauthor "${@}" | sed -n 's:^\\newcommand{\\colauthor}{\([^}]*\)}$:% \1:p'
+	if test $# -gt 0; then
+		grep -h coltitle  "${@}" | sed -n 's:^\\newcommand{\\coltitle}{\([^}]*\)}$:% \1:p'
+		grep -h colauthor "${@}" | sed -n 's:^\\newcommand{\\colauthor}{\([^}]*\)}$:% \1:p'
+	fi
 
 	for file in "$@";do
 		# shellcheck disable=SC2094
