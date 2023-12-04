@@ -125,10 +125,10 @@ $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.jpg
 COMMON_INCLUSIONS=$(wildcard *.tex) $(IMAGES) $(INDIV_POEMS) $(INCLUDEDTEX)
 
 $(MDTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path) check-fixmes
-	sh $(ebook_builder_path)  $(EBOOK_BUILDER_ARGS) -o $@
+	bash $(ebook_builder_path)  $(EBOOK_BUILDER_ARGS) -o $@
 
 $(HTMLTARGETS): $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(ebook_builder_path) check-fixmes
-	sh $(ebook_builder_path) -o $@ $(EBOOK_BUILDER_ARGS)
+	bash $(ebook_builder_path) -o $@ $(EBOOK_BUILDER_ARGS)
 
 $(PDFTARGETS): $(COMMON_INCLUSIONS) $(filter %.pdf,$(ILLUST_FROM_SVG)) check-fixmes
 
@@ -137,7 +137,7 @@ check-fixmes:
 	@$(grep_func) TODO . || true
 
 %.epub: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(EPUB_INCLUSIONS) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
-	sh $(ebook_builder_path) -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
+	bash $(ebook_builder_path) -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
 	sh $(add_to_epub_path) $@ page-map.xml
 
 %.azw3: %.epub
