@@ -145,3 +145,7 @@ check-fixmes:
 	@$(call to-kindle,$<,$@)
 
 %: Makefile
+
+all_images: $(ILLUST_FROM_SVG)
+
+.PHONY: all_images
