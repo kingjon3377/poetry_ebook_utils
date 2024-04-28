@@ -66,6 +66,7 @@ sed	-e '/^$/N;/^\n$/D' | \
 # Replace trailing blank lines, which BSD (macOS) sed removes in previous pattern but GNU sed doesn't
 sed	-e '$s/.$/&\n/' | \
 # Replace end of lines with poetrytex end-of-lines.
+# TODO: We'd like to make this the first four lines *of a stanza*
 sed	-e '1,4s/  $/\\verselinenb/' \
 	-e '5,$s/  $/\\verseline/' | \
 # Replace a double occurrence of our marker characters, when there is a ! between them, with bangincipit{}
