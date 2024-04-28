@@ -58,9 +58,9 @@ handle_output() {
 	fi
 }
 # Remove header and footer
-sed	"${1}" \
-	-e '/^#/d' \
-	-e '/\[.*]([^)]*)/d' | \
+sed	-e '/^#/d' \
+	-e '/\[.*]([^)]*)/d' \
+    "${1}" | \
 # Shrink multiple blank lines to just one between paragraphs
 sed	-e '/^$/N;/^\n$/D' | \
 # Replace end of lines with poetrytex end-of-lines.
