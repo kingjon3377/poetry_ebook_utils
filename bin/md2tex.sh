@@ -63,6 +63,8 @@ sed	-e '/^#/d' \
     "${1}" | \
 # Shrink multiple blank lines to just one between paragraphs
 sed	-e '/^$/N;/^\n$/D' | \
+# Replace trailing blank lines, which BSD (macOS) sed removes in previous pattern but GNU sed doesn't
+sed	-e '$s/.$/&\n/' | \
 # Replace end of lines with poetrytex end-of-lines.
 sed	-e '1,4s/  $/\\verselinenb/' \
 	-e '5,$s/  $/\\verseline/' | \
