@@ -69,6 +69,17 @@ sed	-e '$s/.$/&\n/' | \
 # TODO: We'd like to make this the first four lines *of a stanza*
 sed	-e '1,4s/  $/\\verselinenb/' \
 	-e '5,$s/  $/\\verseline/' | \
+# Handle nested (single-inside-double) quotes properly where we can distinguish
+# them. Since an apostrophe *should* be used at the beginning of some words, we
+# only turn an apostrophe into a left single quote where it is following a
+# colon, semicolon, or period. The other thing we fix here is that LaTeX
+# by default turns a triple quote into a double quote inside a single quote,
+# which is rarely what we want, so we add a non-printing space between them.
+# If any of this produces wrong results, either change the script, pre-process
+# its input, or post-process its output.
+sed -e "s/'\"/'\\\\,\"/g" -e "s/\\([:;\\.]  *\\)'/\\1\`/g" | \
+# Fix double-quotes
+gawk -F \" -e 'BEGIN { RS = "\0" }' -e "{if((NF-1)%2==0){res=\$0;for(i=1;i<NF;i++){to=\"\`\`\";if(i%2==0){to=\"\\\\'\\\\'\"}res=gensub(\"\\\"\", to, 1, res)};print res}else{print}}" | \
 # Replace a double occurrence of our marker characters, when there is a ! between them, with bangincipit{}
 sed	-e 's/￹￹\(.*\)!\(.*\)￻￻/\\bangincipit{\1"!\2}{\1!\2}/g' | \
 # Replace a double occurrence of our marker characters with incipit{}.
@@ -97,17 +108,6 @@ sed	-e 's/\(> \|>\)/\\hspace{2em} /g' | \
 sed	-e 's/	/        /g' | \
 # Translate four-space substrings to single-line indentation.
 sed	-e 's/    /\\hspace{2em} /g' | \
-# Handle nested (single-inside-double) quotes properly where we can distinguish
-# them. Since an apostrophe *should* be used at the beginning of some words, we
-# only turn an apostrophe into a left single quote where it is following a
-# colon, semicolon, or period. The other thing we fix here is that LaTeX
-# by default turns a triple quote into a double quote inside a single quote,
-# which is rarely what we want, so we add a non-printing space between them.
-# If any of this produces wrong results, either change the script, pre-process
-# its input, or post-process its output.
-sed -e "s/'\"/'\\\\,\"/g" -e "s/\\([:;\\.]  *\\)'/\\1\`/g" | \
-# Fix double-quotes
-gawk -F \" -e 'BEGIN { RS = "\0" }' -e "{if((NF-1)%2==0){res=\$0;for(i=1;i<NF;i++){to=\"\`\`\";if(i%2==0){to=\"\\\\'\\\\'\"}res=gensub(\"\\\"\", to, 1, res)};print res}else{print}}" | \
 # Strip off all trailing empty lines?
 sed -e :a -e '/^\n*$/{$d;N;};/\n$/ba' | handle_output "${2}"
 if test $? -eq 0; then
