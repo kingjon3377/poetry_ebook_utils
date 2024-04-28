@@ -99,7 +99,7 @@ includepoem() {
 	fi
 	local section_arg=undefined
 	local real_title=false
-	if sed -n "${1}" -e '1p' | grep -q '^## ".*" ##$'; then
+	if sed -n -e '1p' "${1}" | grep -q '^## ".*" ##$'; then
 		for file in "${ACTUALLY_TITLED[@]}";do
 			if test "${file}" = "${1}";then
 				real_title=true
@@ -107,7 +107,7 @@ includepoem() {
 			fi
 		done
 		if test "${real_title}" = false; then
-			section_arg="$(sed -n "${1}" -e '1p')"
+			section_arg="$(sed -n -e '1p' "${1}")"
 		fi
 	else
 		real_title=true
@@ -122,7 +122,7 @@ includepoem() {
 	fi
 	# TODO: Minimize/combine sed calls
 	# Exclude unwanted lines
-	sed "${1}" "${sedargs[@]}" | \
+	sed "${sedargs[@]}" "${1}" | \
 	# Use em-dashes where appropriate
 	sed -e 's/---/\&mdash;/g' | \
 	# Remove the "invisible" marker Unicode character
