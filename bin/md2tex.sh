@@ -60,7 +60,7 @@ handle_output() {
 # Remove header and footer
 sed	-e '/^#/d' \
 	-e '/\[.*]([^)]*)/d' \
-    "${1}" | \
+	"${1}" | \
 # Shrink multiple blank lines to just one between paragraphs
 sed	-e '/^$/N;/^\n$/D' | \
 # Replace trailing blank lines, which BSD (macOS) sed removes in previous pattern but GNU sed doesn't
@@ -84,8 +84,10 @@ sed	-e '1,2d' \
 	-e '$d' | \
 sed	-e '$d' | \
 # Don't put a \verseline or \verselinenb on the last line of a stanza
-tr '\n' '\f' | sed -e 's/\\verseline\f\\end{stanza}/\f\\end{stanza}/g' \
-		   -e 's/\\verselinenb\f\\end{stanza}/\f\\end{stanza}/g' | tr '\f' '\n' | \
+tr '\n' '\f' | \
+sed -e 's/\\verseline\f\\end{stanza}/\f\\end{stanza}/g' \
+		   -e 's/\\verselinenb\f\\end{stanza}/\f\\end{stanza}/g' | \
+tr '\f' '\n' | \
 # Fix emphasis
 sed	-e 's/_\([^_]*\)_/\\emph{\1}/g' | \
 # Translate Markdown quoting to single-line indentation.
