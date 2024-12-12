@@ -278,9 +278,9 @@ handle_line() {
 	if test $# -eq 0; then return; fi
 	case "${1}" in
 	# When asked to clear the page, emit a div to do that.
-	*clearpage*) echo '<div class="clearpage" />' ;;
-	*cleardoublepage*) echo '<div class="cleardoublepage" />' ;;
-	'\cleartoverso') echo '<div class="cleartoverso" />' ;;
+	*clearpage*) echo '<div class="clearpage"></div>' ;;
+	*cleardoublepage*) echo '<div class="cleardoublepage"></div>' ;;
+	'\cleartoverso') echo '<div class="cleartoverso"></div>' ;;
 	# Skip part-of-the-book commands that primarily control page numbering styles
 	'\frontmatter'|'\mainmatter'|'\backmatter') : ;;
 	# Emit equivalent headers for sequence and section titles.
