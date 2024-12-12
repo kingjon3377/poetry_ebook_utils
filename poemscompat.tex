@@ -130,6 +130,7 @@
 	\newcommand{\verseline}{\\}%
 	\newcommand{\verselinenb}{\\*}%
 }
+\makeatletter
 \poemscompat{%
 	\newcommand{\ptspacer}{\relax}%
 	\newcommand{\incipit}[1]{#1}%
@@ -141,10 +142,13 @@
 	\newenvironment{stanza}[0]{\relax}{\relax}%
 	\sectionfont{\nohang\centering}%
 	\newcommand{\sequencetitle}[1]{\poemgroup{#1}}%
-	\newcommand{\sequencesectiontitle}[1]{\subsection{#1}\addcontentsline{top}{subsection}{#1}}
+	\def\sequencesectiontitle{\@ifstar\@starredsequencesectiontitle\@sequencesectiontitle}%5
+	\newcommand{\@starredsequencesectiontitle}[1]{\thispagestyle{empty}\subsection{#1}}%
+	\newcommand{\@sequencesectiontitle}[1]{\thispagestyle{empty}\subsection{#1}\addcontentsline{top}{subsection}{#1}}%
 	\newcommand{\sequencefirstsectiontitle}[1]{\sequencesectiontitle{#1}}%
 	\newcommand{\silentincipit}[1]{\incipit*{#1}}%
 }
+\makeatother
 
 % A custom inclusion mechanism for poems, to reduce the amount of boilerplate
 % The first argument is the file to include. The second is the title to index
