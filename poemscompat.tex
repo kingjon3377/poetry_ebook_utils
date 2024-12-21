@@ -73,6 +73,17 @@
 	\setlength{\postdedicationvspace}{\fill}%
 	\newcommand*{\beforededication}{}%
 	\newcommand*{\afterdedication}{}%
+	% To allow defining a subtitle
+	\usepackage{titling}%
+	% From https://tex.stackexchange.com/a/50186 by user "egreg"; this
+	% snippet may be shared under CC-BY-SA 3.0
+	\newcommand{\subtitle}[1]{%
+		\posttitle{%
+			\par\end{center}
+			\begin{center}\large#1\end{center}
+			\vskip0.5em%
+		}%
+	}%
 }{%
 	% Defines the symbol we're using to separate titleless poems
 	% from the preceding ones
@@ -94,6 +105,21 @@
 		\renewcommand*{\pttitle}{#2}%
 		\renewcommand*{\ptauthor}{#1}%
 		\renewcommand*{\ptsubtitle}{\relax}%
+	}%
+}
+
+% The \compatfulltitle command sets up either package's title-page knowledge.
+% The first argument is the author, the second the title, and the third the
+% subtitle.
+\newcommand{\compatfulltitle}[3]{%%
+	\poemscompat{%
+		\author{#1}%
+		\title{#2}%
+		\subtitle{#3}%
+	}{%
+		\renewcommand*{\pttitle}{#2}%
+		\renewcommand*{\ptauthor}{#1}%
+		\renewcommand*{\ptsubtitle}{#3}%
 	}%
 }
 
