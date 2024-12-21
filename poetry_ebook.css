@@ -43,3 +43,7 @@ h3.date { }
 ol.toc { padding: 0; margin-left: 1em; }
 ol.toc li { list-style-type: none; margin: 0; padding: 0; }
 div.stanza { margin-top: 1.0em; margin-bottom: 1.0em; }
+/** The longest line in any poem I have published is 61 characters, and the
+ * average character is about half an em wide. So ensure no image can be wider
+ * than the longest line of text. */
+img { max-width: 30em; }
