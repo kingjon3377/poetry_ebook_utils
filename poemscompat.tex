@@ -205,3 +205,29 @@
 % "section subtitle"/"section epigram"/"section explanation", but it could be
 % used for other purposes.
 \newcommand{\epigram}[1]{\begin{center}#1\end{center}}
+
+% A command to render the title and copyright (back-of-title-page) pages. This
+% takes the following arguments:
+% #1 the copyright text (such as "Text and design \textcopyright{} YYYY
+%    \theauthor", assuming 'titling' for \theauthor)
+% #2 the publication date
+% #3 the ISBN-13
+% #4 the ISBN-10
+\newcommand{\titleandcopyright}[4]{%
+	\pagenumbering{gobble}%
+	\cleardoublepage%
+	\pagestyle{empty}%
+	\begin{titlepage}%
+	\date{}%
+	\maketitle%
+	\clearpage%
+	\null%
+	\vfill%
+	\noindent #1
+
+	\noindent Published #2
+
+	\noindent ISBN-13: #3 \\%
+	\noindent ISBN-10: #4%
+	\end{titlepage}%
+}
