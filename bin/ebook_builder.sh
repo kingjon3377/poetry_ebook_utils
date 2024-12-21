@@ -174,7 +174,7 @@ includeimage() {
 	elif test -z "${4}"; then
 		attrs="{ width=${3} }"
 	else
-		attrs="{ width=${3} height=${4}"
+		attrs="{ width=${3} height=${4} }"
 	fi
 	if [ "${graphics_enabled:-true}" = true ]; then
 		# The extra space at the end is to, as per the Pandoc man page, ensure that a caption is not emitted.
