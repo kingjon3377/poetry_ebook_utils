@@ -126,7 +126,7 @@ includepoem() {
 	if test "${real_title}" != true; then
 		sedargs+=( "-e" '/^## ".*" ##$/d' )
 	fi
-	# TODO: Minimize/combine sed calls
+	# TODO: Minimize/combine sed calls: add these to 'sedargs' (if that proves idempotent)
 	# Exclude unwanted lines
 	sed "${sedargs[@]}" "${1}" | \
 	# Use em-dashes where appropriate
