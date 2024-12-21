@@ -93,7 +93,13 @@ wrap_in_section() {
 
 # Include a poem into the ebook
 includepoem() {
-	if ! file_or_link "${1}" ; then
+	if file_or_link "${1}.pregen.md"; then
+		cat "${1}.pregen.md"
+		return
+	elif file_or_link "${1%%.md}.pregen.md"; then
+		cat "${1%%.md}.pregen.md"
+		return
+	else
 		echo "Poem ${1} not found" 1>&2
 		exit 2
 	fi

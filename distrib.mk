@@ -108,7 +108,7 @@ $(ILLUST_DIR)/%.pdf: $(ILLUST_DIR)/%.svg
 # FIXME: The dependency on the pregen file if present doesn't seem to work, so
 # the user has to 'make clean' every time a pregen file is created, changed, or
 # removed.
-$(POEMS_DIR)/%.tex: $(POEMS_DIR)/%.md $(wildcard $(POEMS_DIR)/%.pregen.tex)
+$(POEMS_DIR)/%.tex: $(filter-out %.pregen.md,$(POEMS_DIR)/%.md) $($(wildcard $(POEMS_DIR)/%.pregen.tex))
 	@echo "Regenerating $@"
 	@$(md_to_tex_path) $(md_to_tex_arg) $(POEMS_DIR)/$*.md $@
 
