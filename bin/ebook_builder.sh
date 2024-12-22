@@ -304,7 +304,9 @@ handle_line() {
 			sed -e 's/^[ 	]*sequencefirstsectiontitle{\([^}]*\)}[ 	]*$/\1/' \
 				-e 's/^[ 	]*\\sequencefirstsectiontitle{\([^}]*\)}[ 	]*$/\1/' \
 				-e 's/^[ 	]*sequencesectiontitle{\([^}]*\)}[ 	]*$/\1/' \
-				-e 's/^[ 	]*\\sequencesectiontitle{\([^}]*\)}[ 	]*$/\1/' )" ;;
+				-e 's/^[ 	]*\\sequencesectiontitle{\([^}]*\)}[ 	]*$/\1/' \
+				-e 's/^[ 	]*sequencesectiontitle\*{\([^}]*\)}[ 	]*$/\1/' \
+				-e 's/^[ 	]*\\sequencesectiontitle\*{\([^}]*\)}[ 	]*$/\1/' )" ;;
 	'\epigram{'*'}') echo -n '##### '
 		# shellcheck disable=SC2001
 		echo "${1}" | sed 's@^\\epigram{\([^}]*\)}@\1@' ;;
