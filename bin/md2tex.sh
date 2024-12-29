@@ -42,6 +42,17 @@ if test $# -ne 2; then
 	echo "Usage: $0 [-v|--verbose] [-q|--quiet] original.md target.tex" 1>&2
 	exit 1
 fi
+if test "${secondarg%%.pregen.tex}" != "${secondarg}";then
+	if test "${IGNORE_PREGEN:-false}" != true; then
+		echo "Skipping pregen file ${secondarg}" 1>&2
+		exit 0
+	fi
+elif test "${firstarg%%.pregen.md}" != "${firstarg}";then
+	if test "${IGNORE_PREGEN:-false}" != true; then
+		echo "Skipping pregen file ${firstarg}" 1>&2
+		exit 0
+	fi
+fi
 if test -f "${secondarg%%.tex}.pregen.tex"; then
 	if test "${IGNORE_PREGEN:-false}" != true; then
 		cp "${secondarg%%.tex}.pregen.tex" "${secondarg}" # FIXME: What if $2 is a directory?
