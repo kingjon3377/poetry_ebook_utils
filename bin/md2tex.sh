@@ -109,6 +109,8 @@ sed	-e '$d' | \
 tr '\n' '\f' | \
 sed -e 's/\\verseline\f\\end{stanza}/\f\\end{stanza}/g' \
 		   -e 's/\\verselinenb\f\\end{stanza}/\f\\end{stanza}/g' | \
+# Remove empty stanza environments
+sed -e 's@\f\\begin{stanza}\f*\\end{stanza}@@g' | \
 tr '\f' '\n' | \
 # Fix emphasis
 sed	-e 's/_\([^_]*\)_/\\emph{\1}/g' | \
