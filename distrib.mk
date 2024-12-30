@@ -96,7 +96,7 @@ TEX4HTEXTS:=4tc 4ct 4cc css dvi idv lg tmp xref
 METAD_EXTS:=top ctn idx ilg ind
 POETRY_STYLESHEET:=$(dir $(abspath $(distrib_mk_path)))/poetry_ebook.css
 
-EXTRACLEAN += $(INDIV_POEMS) $(EPS_IMAGES) texput.log $(ILLUST_FROM_SVG)
+EXTRACLEAN += $(filter-out %.pregen.tex,$(INDIV_POEMS)) $(EPS_IMAGES) texput.log $(ILLUST_FROM_SVG)
 EXTRACLEAN += $(foreach EXT,$(TEX4HTEXTS),$(TARGETS:=.$(EXT)))
 EXTRACLEAN += $(foreach EXT,$(METAD_EXTS),$(TARGETS:=.$(EXT)))
 EXTRACLEAN += titles.idx titles.ilg titles.ind
