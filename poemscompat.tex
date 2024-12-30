@@ -165,7 +165,7 @@
 	\renewcommand{\aftersequencetitleskip}{\bigskip}
 	\renewcommand{\sequencetitlefont}{\fontsize{20}{24}\selectfont}
 }{%
-	\newenvironment{stanza}[0]{\relax}{\relax}%
+	\newenvironment{stanza}[0]{\relax}{\vspace{\stanzaparskip}}%
 	\sectionfont{\nohang\centering}%
 	\newcommand{\sequencetitle}[1]{\phantomsection\poemgroup{#1}}%
 	\def\sequencesectiontitle{\@ifstar\@starredsequencesectiontitle\@sequencesectiontitle}%5
