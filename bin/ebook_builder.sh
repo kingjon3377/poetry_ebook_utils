@@ -355,6 +355,7 @@ handle_line() {
 	\\vspace*) : ;;
 	\\vfill) : ;;
 	\\hspace*) : ;;
+	\\setlength*) : ;;
 	*begin*changemargin*|*end*changemargin*) : ;;
 	# Skip page-style commands
 	\\thispagestyle*) : ;;
