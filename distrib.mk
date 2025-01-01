@@ -102,6 +102,9 @@ EXTRACLEAN += $(foreach EXT,$(METAD_EXTS),$(TARGETS:=.$(EXT)))
 EXTRACLEAN += titles.idx titles.ilg titles.ind
 EXTRADISTCLEAN += $(TARGETS:=.html) $(TARGETS:=.epub) $(TARGETS:=.azw3)
 
+# Files to add to the EPUB after it is created.
+EPUB_ADDENDA = page-map.xml
+
 $(ILLUST_DIR)/%.pdf: $(ILLUST_DIR)/%.svg
 	@$(call svg-to-pdf,$@,$<)
 
@@ -139,7 +142,7 @@ check-fixmes:
 
 %.epub: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(EPUB_INCLUSIONS) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
 	bash $(ebook_builder_path) -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
-	sh $(add_to_epub_path) $@ page-map.xml
+	sh $(add_to_epub_path) $@ $(EPUB_ADDENDA)
 
 %.azw3: %.epub
 	@$(call to-kindle,$<,$@)
