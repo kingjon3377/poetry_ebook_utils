@@ -464,7 +464,8 @@ translate_simple_texisms() {
 		-e 's@\\textbf{\([^}]*\)}@**\1**@g' \
 		-e 's/\\\\//g' -e 's/\\url{\([^}]*\)}/[\1](\1)/g' \
 		-e 's/\\mbox{\([^}]*\)}/\1/g' \
-		-e 's/{\\\(small\|footnotesize\)\([^}]*\)}/`\2`/g' \
+		-e 's/{\\small\([^}]*\)}/`\1`/g' \
+		-e 's/{\\footnotesize\([^}]*\)}/`\1`/g' \
 		-e 's/---/\&mdash;/g' \
 		-e 's@~@ @g' \
 		-e 's@\\\\@@g'
