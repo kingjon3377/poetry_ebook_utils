@@ -496,6 +496,8 @@ backmatter() {
 			*\\ptgroup*) continue ;;
 			\\begin\{wrapfigure\}*) continue ;;
 			\\end\{wrapfigure\}*) continue ;;
+			\\begin{minipage}*) echo ;;
+			\\end{minipage}) echo ;;
 			\\vspace*) continue ;;
 			\\includegraphics*) echo "${line}" | translate_author_photo ;;
 			\\clearpage*) continue ;;
