@@ -167,6 +167,12 @@ includeimage() {
 	esac
 	if file_or_link "${base}_color${ext}"; then
 		image="${base}_color${ext}"
+	elif test "${ext}" = ".png" && file_or_link "${base}_color.jpg"; then
+		image="${base}_color.jpg"
+	elif file_or_link "${base%%_cropped}_color.jpg"; then
+		image="${base%%_cropped}_color.jpg"
+	elif file_or_link "${base%%_upscaled}.jpg";then
+		image="${base%%_upscaled}.jpg"
 	else
 		image="${1}"
 	fi
