@@ -173,6 +173,8 @@ includeimage() {
 		image="${base%%_cropped}_color.jpg"
 	elif file_or_link "${base%%_upscaled}.jpg";then
 		image="${base%%_upscaled}.jpg"
+	elif file_or_link "${base}_smaller${ext}";then
+		image="${base}_smaller${ext}"
 	else
 		image="${1}"
 	fi
