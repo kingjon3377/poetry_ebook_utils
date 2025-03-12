@@ -175,6 +175,8 @@ includeimage() {
 		image="${base%%_upscaled}.jpg"
 	elif file_or_link "${base}_smaller${ext}";then
 		image="${base}_smaller${ext}"
+	elif file_or_link "${base}_smaller.jpg";then
+		image="${base}_smaller.jpg"
 	else
 		image="${1}"
 	fi
