@@ -29,6 +29,46 @@ for arg in "$@";do
 		debug_print "File ${arg} not found"
 	fi
 done
+
+mime_type_for() {
+    case "$1" in
+        page-map.xml) echo 'application/oebps-page-map+xml' ;;
+        *.xhtml) echo 'application/xhtml+xml' ;;
+        *) file --brief --mime-type "$1" ;;
+    esac
+}
+
+add_to_manifest_sed() {
+	sed -i -e "/\\/manifest/i \
+		<item id=\"$(basename "${1}" | tr . _)\" href=\"${1}\" media-type=\"${2}\" />\
+" "${tmpdir}/EPUB/content.opf"
+}
+
+add_to_manifest_xmlstarlet() {
+    path="package/manifest/item[@href='${1}']"
+    file="${tmpdir}/EPUB/content.opf"
+    existing=$(xml sel -t -v "${path}" "${file}")
+    if test -n "${existing}";then
+        xml ed --inplace -u "${path}/@media-type" -v "${2}" "${file}"
+    else
+        # Adapted from https://stackoverflow.com/a/65996318
+        # shellcheck disable=SC2016
+        xml ed -s "package/manifest" -t elem --name "item" --var new_node '$prev' \
+            --insert '$new_node' --type attr --name id --value "$(basename "${1}" | tr . _)" \
+            --insert '$new_node' --type attr --name href --value "${1}" \
+            --insert '$new_node' --type attr --name media-type --value "${2}" \
+            "${file}"
+    fi
+}
+
+add_to_manifest() {
+    if command -v xml >/dev/null 2>&1; then
+        add_to_manifest_xmlstarlet "$@"
+    else
+        add_to_manifest_sed "$@"
+    fi
+}
+
 if test "${epub_defined:-false}" != true -o -z "${epub}"; then
 	usage
 	exit 1
@@ -45,16 +85,9 @@ tmpdir=$(mktemp -d)
 unzip -d "${tmpdir}" "${epub}"
 cp "${files_to_include[@]}" "${tmpdir}/EPUB"
 for file in "${files_to_include[@]}";do
-	if test "${file}" = page-map.xml; then
-		mime=application/oebps-page-map+xml
-	else
-		mime=$(file --mime-type "${file}")
-	fi
-#	cp "${file}" "${tmpdir}/EPUB" # FIXME: Do we need this?
+    mime="$(mime_type_for "$file")"
 	debug_print "Adding ${file} to manifest as ${mime}"
-	sed -i -e "/\\/manifest/i \
-		<item id=\"$(basename "${file}" | tr . _)\" href=\"${file}\" media-type=\"${mime}\" />\
-" "${tmpdir}/EPUB/content.opf"
+    add_to_manifest "${file}" "${mime}"
 done
 (
 cd "${tmpdir}"
