@@ -165,19 +165,28 @@ includeimage() {
 	*.jpg) ext=".jpg" base="${1%%.jpg}" ;;
 	*.png) ext=".png" base="${1%%.png}" ;;
 	esac
-	if file_or_link "${base}_color${ext}"; then
-		image="${base}_color${ext}"
-	elif test "${ext}" = ".png" && file_or_link "${base}_color.jpg"; then
-		image="${base}_color.jpg"
-	elif file_or_link "${base%%_cropped}_color.jpg"; then
-		image="${base%%_cropped}_color.jpg"
-	elif file_or_link "${base%%_upscaled}.jpg";then
-		image="${base%%_upscaled}.jpg"
-	elif file_or_link "${base}_smaller${ext}";then
-		image="${base}_smaller${ext}"
-	elif file_or_link "${base}_smaller.jpg";then
-		image="${base}_smaller.jpg"
-	else
+	replacement_found=false
+	for delenda in "" _cropped _upscaled;do
+		if test "${replacement_found:-false}" = true; then
+			break
+		fi
+		inner_base="${base%%"${delenda}"}"
+		for addend in _color _smaller "";do
+			if test "${replacement_found:-false}" = true; then
+				break
+			fi
+			for extension in "${ext}" .jpg .png .svg;do
+				if test "${inner_base}${addend}${extension}" = "${1}"; then
+					continue
+				elif file_or_link "${inner_base}${addend}${extension}"; then
+					replacement_found=true
+					image="${inner_base}${addend}${extension}"
+					break
+				fi
+			done
+		done
+	done
+	if test "${replacement_found:-false}" = false; then
 		image="${1}"
 	fi
 	if test -n "${2}"; then
