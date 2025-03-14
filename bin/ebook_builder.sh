@@ -383,6 +383,7 @@ handle_line() {
 	*begin*changemargin*|*end*changemargin*) : ;;
 	# Skip page-style commands
 	\\thispagestyle*) : ;;
+	\\pagestyle*) : ;;
 	*) { echo -n "Unhandled line:"; for i in "$@";do echo -n " '${i}'";done; echo; } 1>&2 ;;
 	esac
 }
