@@ -202,8 +202,13 @@ includeimage() {
 		attrs="{ width=${3} height=${4} }"
 	fi
 	if [ "${graphics_enabled:-true}" = true ]; then
-		# The extra space at the end is to, as per the Pandoc man page, ensure that a caption is not emitted.
-		echo "![${base}](${image})${attrs}\\ "
+		if test "$#" -lt 5; then
+			# The extra space at the end is to, as per the Pandoc man page, ensure that a caption is not emitted.
+			echo "![${base}](${image})${attrs}\\ "
+		else
+			# Currently we only use the text-providing form for the author photo, where we *do* want a caption
+			echo "![${5}](${image})${attrs}"
+		fi
 		echo
 	elif [ "${graphics_enabled:-true}" != false ]; then
 		echo "${graphics_enabled}"
@@ -462,7 +467,8 @@ translate_section_command() {
 
 # Translate a back-matter graphics inclusion into an 'Author Photo' line.
 translate_author_photo() {
-	sed 's@^\\includegraphics\[[^]]*\]{\([^}]*\)}$@![Author Photo](\1)@'
+	filename=$(echo "${1}" | sed 's@^\\includegraphics\[[^]]*\]{\([^}]*\)}$@\1@')
+	includeimage "${filename}" "" "" "" "Author Photo"
 }
 
 # Translate "trivial" LaTeXisms in the back-matter to Markdown equivalents.
@@ -512,7 +518,7 @@ backmatter() {
 			\\begin{minipage}*) echo ;;
 			\\end{minipage}) echo ;;
 			\\vspace*) continue ;;
-			\\includegraphics*) echo "${line}" | translate_author_photo ;;
+			\\includegraphics*) translate_author_photo "${line}" ;;
 			\\clearpage*) continue ;;
 			'') echo; continue ;;
 			*) echo "${line}" ;;
