@@ -192,14 +192,20 @@ includeimage() {
 	if test -n "${2}"; then
 		base=${2}
 	fi
-	if test -z "${3}" && test -z "${4}" || test "${pandoc_attribs}" = false; then
+	attrs_arr=( )
+	if test -n "${3}"; then
+		attrs_arr+=( "width=${3}" )
+		test -z "${4}" && attrs_arr+=( "height=auto" )
+	fi
+	if test -n "${4}"; then
+		attrs_arr+=( "height=${4}" )
+		test -z "${3}" && attrs_arr+=( "width=auto" )
+	fi
+	test -z "${5}" && attrs_arr+=( "role=presentation" )
+	if test "${pandoc_attribs}" == false || test "${#attrs_arr[@]}" -eq 0; then
 		attrs=""
-	elif test -z "${3}"; then
-		attrs="{ height=${4} }"
-	elif test -z "${4}"; then
-		attrs="{ width=${3} }"
 	else
-		attrs="{ width=${3} height=${4} }"
+		attrs="{ ${attrs_arr[*]} }"
 	fi
 	if [ "${graphics_enabled:-true}" = true ]; then
 		if test "$#" -lt 5; then
