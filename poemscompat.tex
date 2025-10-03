@@ -206,6 +206,11 @@
 % used for other purposes.
 \newcommand{\epigram}[1]{\begin{center}#1\end{center}}
 
+% Implementation command (not for direct use in documents): If the argument is
+% non-empty, insert a line break and print that the argument is an ISBN-10,
+% but if it is empty do nothing.
+\newcommand{\isbnten}[1]{\if\relax #1 \relax\else \\ISBN-10: #1 \fi}
+
 % A command to render the title and copyright (back-of-title-page) pages. This
 % takes the following arguments:
 % #1 the copyright text (such as "Text and design \textcopyright{} YYYY
@@ -227,7 +232,6 @@
 
 	\noindent Published #2
 
-	\noindent ISBN-13: #3 \\%
-	\noindent ISBN-10: #4%
+	\noindent ISBN-13: #3\isbnten{#4}%
 	\end{titlepage}%
 }
