@@ -81,7 +81,7 @@ diff: $(PDFTARGETS)
 	echo $(foreach T,$(PDFTARGETS:.pdf=),$(T).old.pdf $(T).pdf ) | xargs -P 2 -n 2 diffpdf
 
 MDTARGETS = $(TARGETS:=.md)
-EPUBTARGETS = $(TARGETS:=.epub)
+EPUBTARGETS = $(TARGETS:=.epub) $(TARGETS:=.nocover.epub)
 KINDLE_TARGETS = $(TARGETS:=.azw3)
 HTMLTARGETS = $(TARGETS:=.html)
 
@@ -100,7 +100,7 @@ EXTRACLEAN += $(filter-out %.pregen.tex,$(INDIV_POEMS)) $(EPS_IMAGES) texput.log
 EXTRACLEAN += $(foreach EXT,$(TEX4HTEXTS),$(TARGETS:=.$(EXT)))
 EXTRACLEAN += $(foreach EXT,$(METAD_EXTS),$(TARGETS:=.$(EXT)))
 EXTRACLEAN += titles.idx titles.ilg titles.ind
-EXTRADISTCLEAN += $(TARGETS:=.html) $(TARGETS:=.epub) $(TARGETS:=.azw3)
+EXTRADISTCLEAN += $(TARGETS:=.html) $(EPUBTARGETS) $(KINDLE_TARGETS)
 
 # Files to add to the EPUB after it is created.
 EPUB_ADDENDA = page-map.xml
@@ -118,7 +118,7 @@ $(POEMS_DIR)/%.tex: $(filter-out %.pregen.md,$(POEMS_DIR)/%.md) $($(wildcard $(P
 	@echo "Regenerating $@"
 	@$(md_to_tex_path) $(md_to_tex_arg) $(POEMS_DIR)/$*.md $@
 
-all: $(TARGETS:=.html) $(TARGETS:=.epub) $(TARGETS:=.azw3)
+all: $(TARGETS:=.html) $(EPUBTARGETS) $(KINDLE_TARGETS)
 
 $(ILLUST_DIR)/%.eps: $(ILLUST_DIR)/%.svg
 	inkscape -z -f $< -E $@
@@ -140,8 +140,12 @@ check-fixmes:
 	@$(grep_func) FIXME . || true
 	@$(grep_func) TODO . || true
 
-%.epub: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(EPUB_INCLUSIONS) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
-	bash $(ebook_builder_path) -o $@ --cover $(COVER) --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
+%.nocover.epub: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(EPUB_INCLUSIONS) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path)
+	bash $(ebook_builder_path) -o $@ --exclude-cover --style $(POETRY_STYLESHEET) $(NOCOVER_EBOOK_BUILDER_ARGS)
+	sh $(add_to_epub_path) $@ $(NOCOVER_EPUB_ADDENDA)
+
+%.epub: $(COMMON_INCLUSIONS) $(INCLUDED_MD) $(EPUB_INCLUSIONS) $(ebook_builder_path) $(POETRY_STYLESHEET) $(add_to_epub_path) $(COVER)
+	bash $(ebook_builder_path) -o $@ --cover $(COVER) --include-cover --style $(POETRY_STYLESHEET) $(EBOOK_BUILDER_ARGS)
 	sh $(add_to_epub_path) $@ $(EPUB_ADDENDA)
 
 %.azw3: %.epub
