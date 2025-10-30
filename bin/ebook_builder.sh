@@ -494,6 +494,7 @@ translate_simple_texisms() {
 		-e 's/{\\footnotesize\([^}]*\)}/`\1`/g' \
 		-e 's/---/\&mdash;/g' \
 		-e 's@~@ @g' \
+		-e 's@`\[\([^]]*\)\]\((.*)\)`@[`\1`]\2@g' \
 		-e 's@\\\\@@g'
 }
 
